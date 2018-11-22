@@ -1,0 +1,191 @@
+import config as conf
+import  tool.model.sequence as Sequence
+import  tool.butil.split_seq as splitter
+import  tool.butil.shift_bbox as shifter
+import numpy as np
+import os
+import sys
+import cv2 as cv
+import scipy.io as sio
+sys.path.append('/home/winston/workSpace/PycharmProjects/tracking/')
+sys.path.append('/home/winston/workSpace/PycharmProjects/tracking/SiamFC')
+
+import SiamFC as sfc        ## 此处为SiamFC算法
+
+
+
+
+
+### $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+###　内部函数定义部分
+def initSingleSeq(sceneName,imgsDir,annoDir,sysType='NORMAL'):
+    name = sceneName
+    path = imgsDir
+    if path[-1] != '/':
+        path = path + '/'
+    imgfiles = sorted(os.listdir(imgsDir))
+    imgfiles = [x for x in imgfiles if x.split('.')[1] in ['jpg', 'png']]
+    maxLen = 0
+    for ii in range(len(imgfiles)):
+        tempLen = len(imgfiles[ii])
+        if maxLen < tempLen:
+            maxLen = tempLen
+    nz = maxLen - 4
+    ext = imgfiles[1][-4:]
+    startFrame = int(imgfiles[0][:-4])
+    # 此处的 startFrame lenn 以及 endFrame 依然保持原本的正常数量.
+    if sysType == 'NORMAL':
+        endFrame = int(imgfiles[-1][:-4])
+        dsRate = 1
+    elif sysType == 'INTERPOLATE':
+        newEnd = int(imgfiles[-1][:-4])
+        endFrame = startFrame + int((newEnd - startFrame )/defaultDownSampleRate)
+        dsRate = defaultDownSampleRate
+    lenn = endFrame - startFrame + 1
+    attributes = ''
+    gtFile = open(annoDir)
+    gtLines = gtFile.readlines()
+    gtRect = []
+    for line in gtLines:
+        if '\t' in line:
+            gtRect.append(list(map(int, line.strip().split('\t'))))
+        elif ',' in line:
+            gtRect.append(list(map(int, line.strip().split(','))))
+        elif ' ' in line:
+            gtRect.append(list(map(int, line.strip().split(' '))))
+    anno = np.array(gtRect)
+    anno = anno.astype(np.float64)
+    init_rect = [0,0,0,0]
+    imgFormat = "{0}{1}{2}{3}".format("{0:0", nz, "d}.", ext)
+    seq_ = Sequence.Sequence(name, path, startFrame, endFrame,
+                   attributes, nz, ext, lenn ,imgFormat, anno, init_rect,sysType,dsRate)
+    return seq_
+
+
+### $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+###　全局变量定义部分
+scenesSetDir = '/media/winston/新加卷/OTB_Other/first experiment/';systemType = 'NORMAL'   # 'NORMAL','INTERPOLATE'
+#scenesSetDir = '/media/winston/新加卷/OTB_Other/_Interpolated/';systemType = 'INTERPOLATE'   # 'NORMAL','INTERPOLATE'
+scenesList=os.listdir(scenesSetDir)
+resMatDestDir = './results/'
+resDir =scenesSetDir[:-1]+'_res/'
+if os.path.exists(resDir):
+    os.mkdir(resDir)
+
+evalType = 'TRE'        # 'OPE','SRE','TRE'
+TrackerInstructions = ['sfc.runSiam(subSeqsK, 0, 0)']
+TrackerNames         = ['SiameseFC']
+matResSuffix = ''
+DatasetBase = '/media/winston/新加卷/OTB100/'
+defaultDownSampleRate = 2
+'''
+1.对于系统类型而言,如果是插帧,那么需要s_frame typeName downSampleRate做出调整
+2.插帧不同设置的地方在于:  1)设计初始总段的时候,只有s_frame遵循插帧，其他属性保持不变 2)TRE拆分时候 3)最终结果下采样
+'''
+
+### $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+### 脚本部分
+
+#z = initSingleSeq(scenesList[0], scenesSetDir + scenesList[0] + '/img/','/media/winston/新加卷/OTB100/'+ scenesList[0] + '/groundtruth_rect.txt')
+
+
+for idxScene in range(len(scenesList)):
+    # 获得原始seq与初始工作
+    scenDir = scenesSetDir + scenesList[idxScene] + '/img/'
+    annoFile = DatasetBase + scenesList[idxScene] + '/groundtruth_rect.txt'
+    seq = initSingleSeq(scenesList[idxScene],scenDir,annoFile,systemType)###$$$１
+    img = cv.imread(scenDir+'0001'+seq.ext)
+    imgW = img.shape[1]
+    imgH = img.shape[0]
+
+
+    saveDir = resMatDestDir + scenesList[idxScene] + '/' + systemType + '_' + evalType + '_' + 'result/'
+
+
+    # 进行Seq split
+    if systemType == 'NORMAL':
+        subSeqs, subAnno = splitter.split_seq_TRE(seq, seq.anno)
+    elif systemType == 'INTERPOLATE':
+        subSeqs, subAnno = splitter.split_seq_TRE(seq, seq.anno,systemType,defaultDownSampleRate)
+    # 进行seq依照类型调整
+    if evalType=='SRE':
+        subS = subSeqs[0]
+        subA = subAnno[0]
+        subSeqs = []
+        subAnno = []
+        shiftTypes = shifter.retShiftTypeList()
+        counter = 0
+        for i in range(len(shiftTypes)):
+            subSeqs.append(subS)
+            sType = shiftTypes[i]
+            subSeqs[i].init_rect = shifter.shift_init_BB(subS.init_rect,shiftTypes[i],imgH,imgW);
+            subSeqs[i].shiftType = shiftTypes
+            subAnno.append(subA)
+    elif evalType == 'OPE':
+        subS = subSeqs[0]
+        subA = subAnno[0]
+        subSeqs = []
+        subAnno = []
+        subSeqs.append(subS)
+        subAnno.append(subA)
+    # 跑算法
+    for idxTracker in range(len(TrackerInstructions)):
+        saveName = scenesList[idxScene] + '_' + TrackerNames[idxTracker] + matResSuffix + '.mat'
+        if os.path.exists(saveDir+saveName):
+            print('已经存在:',saveDir + saveName)
+            continue
+        resList = np.zeros((1,len(subSeqs)), dtype=np.object)
+        for idxSubSeq in range(len(subSeqs)):
+            subSeqsK = subSeqs[idxSubSeq]
+            trackerRes = eval(TrackerInstructions[idxTracker]) # 返回的res,至少含有'fps','res','type'
+            # build the standard evaluation mat file dict
+            resDict = dict()
+            resDict['fps']      = trackerRes['fps']
+            resDict['type']     = trackerRes['type']
+            resDict['len']      = subSeqsK.lenn  #####
+            resDict['annoBegain']   = 1
+            resDict['startFrame']   = subSeqsK.startFrame
+            resDict['endFrame']     = subSeqsK.endFrame
+            resDict['anno']         = subSeqsK.anno
+            resDict['typeName']         = subSeqsK.typeName
+
+            if systemType == 'NORMAL':
+                resDict['res'] = trackerRes['res']
+                resDict['downSampleRate'] = 1
+            elif systemType == 'INTERPOLATE':
+                num = trackerRes['res'].shape[0]
+                idxChoice = range(0,num,defaultDownSampleRate)
+                resDict['res'] = trackerRes['res'][idxChoice,:]
+                resDict['downSampleRate'] = subSeqsK.downSampleRate
+            resList[0,idxSubSeq] = resDict
+            print('Scene: '+ scenesList[idxScene] + ', Tracker :' + TrackerNames[idxTracker] + ' '+ str(idxSubSeq+1) + '/' + str(len(subSeqs)) )
+        # 仍然需要到matlab那里注册一下
+        if not os.path.exists(saveDir):
+            os.mkdir(saveDir)
+        sio.savemat(saveDir + saveName, {'results': resList})
+    a = 10
+    # 整理结果并保存
+
+
+
+''''
+
+
+    gtFile = open(os.path.join(src, GT_FILE))
+    gtLines = gtFile.readlines()
+    gtRect = []
+    for line in gtLines:
+        if '\t' in line:
+            gtRect.append(map(int, line.strip().split('\t')))
+        elif ',' in line:
+            gtRect.append(map(int, line.strip().split(',')))
+        elif ' ' in line:
+            gtRect.append(map(int, line.strip().split(' ')))
+    init_rect = [0, 0, 0, 0]
+    seq = Sequence(name, path, startFrame, endFrame,
+                   attributes, nz, ext, imgFormat, gtRect, init_rect)
+
+
+
+'''
+

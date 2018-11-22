@@ -1,0 +1,24 @@
+<xml>
+	<properties>
+		<!-- resize the image to specified scale for tracking  -->
+		<imgScale>1.00</imgScale>
+		<!-- the patch size -->
+		<patchSize>5</patchSize>
+		<!-- dictionary size (percentage) -->
+		<dictionarySize>0.15</dictionarySize>
+		<!-- the sparsity parameter K -->
+		<sparsityK>3</sparsityK>
+	</properties>
+	<sequence>
+		<name>carDark_1</name>
+		<gtFile>./config/carDark_1_gt.txt</gtFile>
+		<imgFolder>E:\OTB100\CarDark\img\</imgFolder>
+		<imgIdFormat>%04d</imgIdFormat>
+		<imgExt>jpg</imgExt>
+		<startFrame>1</startFrame>
+		<endFrame>393</endFrame>
+		<writeImage>0</writeImage>
+		<showResult>0</showResult>
+		<outputFolder>./results</outputFolder>
+	</sequence>
+</xml>

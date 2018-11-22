@@ -1,0 +1,21 @@
+1.最后结项的时候，可以采用添加文件的形式修改原tracker。文件放到tracker工程的根目录
+InterfaceXXX，其中有函数： run_XXX(imgSet,initRect), return bbox,fps
+
+2.最终结合的话考虑结合插帧的追踪算法主要排名：
+DaSiamRPN
+
+3.需要考虑怎么样按照算法类别，把性能结果，弄到一张图里面
+
+4.运行结果以 Evaluation/results/ ‘stageType->DS_type->DatabaseType=>videoName_TrkName.mat’ 为保存对象。
+
+5.注意模型之间不同的图像数据读写： opencv PIL
+
+
+6.数据集分为：Original Ideal2 Std2 StdInterp2
+举例：
+Ideal2 原本100帧，计算100帧tracking结果，对结果进行降维，之后计算metric
+Std2 原本50帧，计算50帧的tracking结果，计算metric
+StdInterp2 原本50帧，插帧到100帧，计算100帧的tracking结果，计算结果降维，之后计算metric
+** StdInterpMutual 类似Std2操作。
+
+

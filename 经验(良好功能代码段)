@@ -1,0 +1,15 @@
+1.返回当前文件路径，用于修改import后的包 
+basePath = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(basePath) or sys.path.insert(0,basePath)
+
+2.如何使用matlab的python接口:
+数据多以list送入matlab数据转换口，或者是将其直接注入调用函数(此时输入为cell格式)
+
+eng = matlab.engine.start_matlab()
+imgList = ['0001.jpg','0009.jpg','0030.jpg','0323.jpg']
+init_rect = list(np.array([0.1,0.2,0.3,0.4],dtype=np.float32))
+b = matlab.single(init_rect)
+res = eng.run_DSLT(imgList,b)
+res1 = res[1]
+
+
