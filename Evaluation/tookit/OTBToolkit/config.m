@@ -53,10 +53,12 @@ conf.IdealStartEndF('Freeman3_2')     = [1,459];          % 0 1
 conf.IdealStartEndF('Freeman4_2')     = [1,283];          % 0 0
 conf.IdealStartEndF('Diving_2')       = [1,215];          % 0 0
 conf.IdealStartEndF('Tiger1_2')      = [7,353];
-
 conf.StdInterpStartEndF = conf.IdealStartEndF;
-
 conf.StdStartEndF = containers.Map();       
+
+conf.MDE = 100;
+
+
 
 for idxKey = 1:length(keys(conf.IdealStartEndF))
     keyset = keys(conf.IdealStartEndF);
