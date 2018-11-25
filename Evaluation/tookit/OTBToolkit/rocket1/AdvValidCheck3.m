@@ -92,7 +92,7 @@ videosList = dir(datasetBase);
 videosList = videosList(3:end);
 
 
-for idxVideo=1:length(videosList) %% Here to do the paralell things
+for idxVideo=3:6:length(videosList) %% Here to do the paralell things
     %% get the imgSet
     videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
     imgSet = {};
@@ -161,7 +161,7 @@ for idxVideo=1:length(videosList) %% Here to do the paralell things
         saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
         %%%
         disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-        str0 = ['[resAdv ,InterpBboxAdv,fpsAdv,MDEAdv] = run_' t.name '_' 'ADV1'  '(imgSet,init_rect);'];
+        str0 = ['[resAdv ,InterpBboxAdv,fpsAdv,MDEAdv] = run_' t.name '_' 'ADV3'  '(imgSet,init_rect);'];
         eval(str0);
         results = {};
         res = struct;
