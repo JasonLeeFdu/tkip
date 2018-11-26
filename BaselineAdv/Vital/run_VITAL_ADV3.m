@@ -16,7 +16,6 @@ addpath('./vital');
 addpath('./tracking');
 addpath('./adv');
 conf = config;
-MDEThresh = conf.MDE;
 
 display = false;
 global gpu;
@@ -109,15 +108,16 @@ total_neg_data{1} = feat_conv(:,:,:,neg_idx);
 success_frames = 1;
 trans_f = opts.trans_f;
 scale_f = opts.scale_f;
-
-
 tic;
 startt = toc;
-%% Main loop
-for To = 2:nFrames
-   %% Whether need enhancement, judged by 'Difference' M11251815
-    thisImg = imread(imgSet{To});
-    lastImg = imread(imgSet{To-1});
+
+%% calculate the MDE
+fprintf('MDE Calculatio\n');
+
+for x = 2:nFrames
+    %% Whether need enhancement, judged by 'Difference' M11251815
+    thisImg = imread(imgSet{x});
+    lastImg = imread(imgSet{x-1});
     
     [h,w,c] = size(thisImg);
     if(c ==1)
@@ -131,8 +131,14 @@ for To = 2:nFrames
     end
     diff = abs(thisY-lastY);
     MDE = sum(sum(diff))/(w*h);
-    MDEArr(To) = MDE;
-    if MDE > MDEThresh
+    MDEArr(x) = MDE;
+end
+    MDEThresh = prctile(MDEArr,conf.RateNotInterp); % conf.RateNotInterp Partial not use interp
+fprintf('>\n');
+
+%% Main loop
+for To = 2:nFrames
+    if MDEArr(To) > MDEThresh
        %% for enhancement
         imgInterpLast = interpAlg(imgSet,To);
         if(size(imgInterpLast,3)==1), imgInterpLast = cat(3,imgInterpLast,imgInterpLast,imgInterpLast); end 
@@ -158,7 +164,7 @@ for To = 2:nFrames
     % If the confidence from the t-0.5 is bigger than that of t-1.0, then
     % we use the rect of t-1.
     
-     if MDE > MDEThresh
+     if MDEArr(To) > MDEThresh
         if target_score_Itp > targetScores(To-1) && targetScores(To-1) > 0
             samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
             samples2 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
