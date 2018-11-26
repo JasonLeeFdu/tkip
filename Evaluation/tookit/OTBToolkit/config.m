@@ -56,7 +56,7 @@ conf.IdealStartEndF('Tiger1_2')      = [7,353];
 conf.StdInterpStartEndF = conf.IdealStartEndF;
 conf.StdStartEndF = containers.Map();       
 
-conf.MDE = 100;
+conf.RateNotInterp = 30;
 
 
 
