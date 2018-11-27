@@ -132,6 +132,9 @@ for x = 2:nFrames
     diff = abs(thisY-lastY);
     MDE = sum(sum(diff))/(w*h);
     MDEArr(x) = MDE;
+    if mod(x,100)==0
+        fprintf('-');
+    end
 end
     MDEThresh = prctile(MDEArr,conf.RateNotInterp); % conf.RateNotInterp Partial not use interp
 fprintf('>\n');
