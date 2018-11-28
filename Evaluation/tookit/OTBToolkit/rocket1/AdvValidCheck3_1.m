@@ -175,7 +175,7 @@ for idxVideo=1%1:6:length(videosList) %% Here to do the paralell things
         res.anno       = rect_anno;
         res.res        = resAdv;
         res.InterpBbox = InterpBboxAdv;
-        res.MDE     = MDEAdv;
+        %res.MDE     = MDEAdv;
         results{end+1}  = res;
         save(saveAdv, 'results');
         
