@@ -1,4 +1,4 @@
-function [ result ,Interp_bbox,fps] = run_VITAL_ADV3Interface(imgSet, init_rect)
+function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_1(imgSet, init_rect)
 %% The first amendment for the advanced VITAL. In order to generate a better
 %% demo, we fix this function by letting it record the result bbox of the 
 %% procedure that manipulates interpolated frames  
@@ -17,7 +17,7 @@ addpath('./adv');
 display = false;
 global gpu;
 gpu=true;
-
+conf = config;
 net=fullfile('./models/otbModel.mat');
 
 %% Initialization
@@ -117,7 +117,7 @@ operateFlags = rand(1,nFrames);
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%% calculate the MDE
+%% calculate the MDE-Global  : MDEG
 fprintf('MDE Calculatio\n');
 
 for x = 2:nFrames
@@ -137,18 +137,14 @@ for x = 2:nFrames
     end
     diff = abs(thisY-lastY);
     MDE = sum(sum(diff))/(w*h);
-    MDEArr(x) = MDE;
+    MDEGArr(x) = MDE;
     if mod(x,100)==0
         fprintf('-');
     end
 end
-MDEThresh = prctile(MDEArr,conf.RateNotInterp); % conf.RateNotInterp Partial not use interpMDEArr
-operateFlags = MDEArr > MDEThresh;
+MDEThresh = prctile(MDEGArr,conf.RateNotInterp); % conf.RateNotInterp Partial not use interpMDEArr
+operateFlags = MDEGArr > MDEThresh;
 fprintf('>\n');
-
-
-
-
 
 %% Main loop
 for To = 2:nFrames
