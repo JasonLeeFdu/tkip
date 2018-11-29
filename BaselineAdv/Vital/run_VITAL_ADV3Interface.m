@@ -1,13 +1,9 @@
-function [ result ,Interp_bbox,fps,MDEArr] = run_VITAL_ADV3(imgSet, init_rect)
+function [ result ,Interp_bbox,fps] = run_VITAL_ADV3Interface(imgSet, init_rect)
 %% The first amendment for the advanced VITAL. In order to generate a better
 %% demo, we fix this function by letting it record the result bbox of the 
 %% procedure that manipulates interpolated frames  
 
-%% Version 3: try to introduce the 'Difference' of the adjacent frames
-%% If the difference is large, then the frame interp is needed.
-%% into the alg
-
-%% 融合策略 更新策略
+%% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
 
 run ./matconvnet/matlab/vl_setupnn ;
 addpath('./utils');
@@ -15,7 +11,8 @@ addpath('./models');
 addpath('./vital');
 addpath('./tracking');
 addpath('./adv');
-conf = config;
+
+
 
 display = false;
 global gpu;
@@ -27,8 +24,7 @@ net=fullfile('./models/otbModel.mat');
 % fprintf('Initialization...\n');   
 
 nFrames = length(imgSet);
-MDEArr = zeros(1,nFrames);
-MDEArr(1) = 0;
+
 img = imread(imgSet{1});
 if(size(img,3)==1), img = cat(3,img,img,img); end
 targetLoc = init_rect;
@@ -108,67 +104,53 @@ total_neg_data{1} = feat_conv(:,:,:,neg_idx);
 success_frames = 1;
 trans_f = opts.trans_f;
 scale_f = opts.scale_f;
+
+
 tic;
 startt = toc;
 
-%% calculate the MDE
-fprintf('MDE Calculatio\n');
-
-for x = 2:nFrames
-    %% Whether need enhancement, judged by 'Difference' M11251815
-    thisImg = imread(imgSet{x});
-    lastImg = imread(imgSet{x-1});
-    
-    [h,w,c] = size(thisImg);
-    if(c ==1)
-            thisY = thisImg;
-            lastY = lastImg;
-    else
-            thisY = rgb2ycbcr(thisImg);
-            thisY = thisY(:,:,1);
-            lastY = rgb2ycbcr(lastImg);
-            lastY = lastY(:,:,1);
-    end
-    diff = abs(thisY-lastY);
-    MDE = sum(sum(diff))/(w*h);
-    MDEArr(x) = MDE;
-    if mod(x,100)==0
-        fprintf('-');
-    end
-end
-MDEThresh = prctile(MDEArr,conf.RateNotInterp); % conf.RateNotInterp Partial not use interpMDEArr
-MDEArr = MDEArr / MDEArr * 10000;
-fprintf('>\n');
+target_score = 2.8888888;
+%%%%%%%%%%%%%%%%%%%%%%%%
+%operateFlags = true(1,nFrames);
+%operateFlags = false(1,nFrames);
+operateFlags = rand(1,nFrames);
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Main loop
 for To = 2:nFrames
-    if MDEArr(To) > MDEThresh
-       %% for enhancement
-        imgInterpLast = interpAlg(imgSet,To);
-        if(size(imgInterpLast,3)==1), imgInterpLast = cat(3,imgInterpLast,imgInterpLast,imgInterpLast); end 
-        samples_Itp = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
-        feat_conv_Itp = mdnet_features_convX(net_conv, imgInterpLast, samples_Itp, opts);
-        feat_fc_Itp = mdnet_features_fcX(net_fc, feat_conv_Itp, opts);
-        feat_fc_Itp = squeeze(feat_fc_Itp)';
-        [scores_Itp,idx_Itp] = sort(feat_fc_Itp(:,2),'descend');  
-        target_score_Itp = mean(scores_Itp(1:5));
-        targetLoc_Itp = round(mean(samples_Itp(idx_Itp(1:5),:))); 
-       %% end the enhancement
+    OF = operateFlags(To); %%%% This is the interface
+    %$
+    OF = OF > 0.5;
+    %% for enhancement
+    if OF 
+        imgInterpLast = interpAlg(imgSet,To);%$
+        if(size(imgInterpLast,3)==1), imgInterpLast = cat(3,imgInterpLast,imgInterpLast,imgInterpLast); end
+        samples_Itp = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);%$
+        feat_conv_Itp = mdnet_features_convX(net_conv, imgInterpLast, samples_Itp, opts);%%
+        feat_fc_Itp = mdnet_features_fcX(net_fc, feat_conv_Itp, opts);%%
+        feat_fc_Itp = squeeze(feat_fc_Itp)';%%
+        [scores_Itp,idx_Itp] = sort(feat_fc_Itp(:,2),'descend');  %%
+        target_score_Itp = mean(scores_Itp(1:5));%%
+        targetLoc_Itp = round(mean(samples_Itp(idx_Itp(1:5),:))); %%
+    else
+        %% Take t-1 as the silent res
+        target_score_Itp = target_score;%%
+        targetLoc_Itp = targetLoc; %%
+    end
+    
+    %% end the enhancement
+    if OF
         Interp_bbox(interpCounter,:) = targetLoc_Itp;
         interpCounter = interpCounter + 1;
     else
-     	Interp_bbox(interpCounter,:) = [-1 -1 -1 -1];
+        Interp_bbox(interpCounter,:) = targetLoc;
         interpCounter = interpCounter + 1;
     end
-    img = thisImg;
-    if(size(img,3)==1), img = cat(3,img,img,img); end 
     
     
-    %% Estimation 下面开始好好的跑检测的步骤#@
-    % If the confidence from the t-0.5 is bigger than that of t-1.0, then
-    % we use the rect of t-1.
     
-     if MDEArr(To) > MDEThresh
+    %% Estimation 下面开始好好的跑检测的步骤
+    if OF
         if target_score_Itp > targetScores(To-1) && targetScores(To-1) > 0
             samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
             samples2 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
@@ -180,10 +162,15 @@ for To = 2:nFrames
             samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
             samples = samples1;
         end
-     else
-           samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
-           samples = samples1;
-     end
+    else
+        samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
+        samples = samples1;
+    end
+    
+    img = imread(imgSet{To});
+    if(size(img,3)==1), img = cat(3,img,img,img); end 
+    
+    
     
     % draw target candidates,按照高斯的方法,在上一帧附近采样,并且利用函数mdnet_features_convX抽取他们的特征
     feat_conv = mdnet_features_convX(net_conv, img, samples, opts);
@@ -195,6 +182,8 @@ for To = 2:nFrames
     target_score = mean(scores(1:5));
     targetLoc = round(mean(samples(idx(1:5),:))); % 结果是前五名框的平均
     
+    
+
     % final target without regression
     result(To,:) = targetLoc;
     Interp_bbox(interpCounter,:) = targetLoc;
@@ -205,7 +194,8 @@ for To = 2:nFrames
     else
         trans_f = opts.trans_f;
     end
-    
+
+    % if OF
     % bbox regression ###$$$ 这个可能是下面工作将要解决的问题
     if(opts.bbreg && target_score>0)
         X_ = permute(gather(feat_conv(:,:,:,idx(1:5))),[4,3,1,2]);
@@ -216,8 +206,8 @@ for To = 2:nFrames
         Interp_bbox(interpCounter,:) = round(mean(pred_boxes,1));
     end
     interpCounter = interpCounter + 1;
-    
-    
+    %end
+   
     %% Prepare training data  本图的追踪结果基础上记录
     if(target_score>0)
         pos_examples = gen_samples('gaussian', targetLoc, opts.nPos_update*2, opts, 0.1, 5);
