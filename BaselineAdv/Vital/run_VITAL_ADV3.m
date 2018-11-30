@@ -137,6 +137,7 @@ for x = 2:nFrames
     end
 end
     MDEThresh = prctile(MDEArr,conf.RateNotInterp); % conf.RateNotInterp Partial not use interp
+    MDEThresh = MDEThresh / MDEThresh - 1;
 fprintf('>\n');
 
 %% Main loop
