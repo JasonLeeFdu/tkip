@@ -7,7 +7,7 @@ strategy = 'Adv';
 VIDEO_INTERP_CLIP_PATH = '/home/winston/Datasets/Tracking/OriginalInterp2/OTB100';
 global additionalNameTag
 additionalNameTag = strategy;
-testVideoSet = {'David','Diving','Bird2'};%{'Basketball','Diving'  };
+testVideoSet = {'Basketball'};%{'Basketball','Diving'  };
 methodName_ = {'VITAL'};%{'ECO','VITAL'};
 dBType = 'OTB100';
 baseVideoSet = 'Original';
@@ -17,9 +17,9 @@ if strcmp(additionalNameTag,'')
 else
     outputPath =  fullfile(conf.BASE_PATH,strcat('/Evaluation/results/vidvis3')); %%%%%% GET IT MODIFIED
 end
-isAllVideos = true;
+isAllVideos = false;
 isAllMethods = true;
-isOverwrite = false;%false
+isOverwrite = true;%false 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 OriginalResPath= fullfile(conf.BASE_PATH,'/Evaluation/results/trackingResults/Original',dBType);
 %OriginalInterpResPath = fullfile(conf.BASE_PATH,'/Evaluation/results/trackingResults/OriginalInterp2',dBType);
