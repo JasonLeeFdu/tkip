@@ -7,7 +7,7 @@ tP   = '/home/winston/Desktop/SRDS/Urban100';
 
 
 
-outfilename = websave(fullfile(tP,'1.jpg'),txt{1})
+outfilename = websave(fullfile(tP,'1.jpg'),txt{1});
 
 % 
 % for i = 1:num
