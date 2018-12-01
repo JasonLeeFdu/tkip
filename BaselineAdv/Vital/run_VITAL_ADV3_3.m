@@ -4,7 +4,7 @@ function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_3(imgSet, init_rect
 %% procedure that manipulates interpolated frames  
 
 %% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
-%%% THresh Test
+%%% 局部更新算法**   v1.0
 run ./matconvnet/matlab/vl_setupnn ;
 addpath('./utils');
 addpath('./models');
@@ -110,54 +110,19 @@ tic;
 startt = toc;
 
 target_score = 2.8888888;
-%%%%%%%%%%%%%%%%%%%%%%%%
-%operateFlags = true(1,nFrames);
-%operateFlags = false(1,nFrames);
-operateFlags = rand(1,nFrames);
-%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%% calculate the MDE-Global  : MDEG
-fprintf('MDE Calculatio\n');
-
-for x = 2:nFrames
-    %% Whether need enhancement, judged by 'Difference' M11251815
-    thisImg = imread(imgSet{x});
-    lastImg = imread(imgSet{x-1});
-    
-    [h,w,c] = size(thisImg);
-    if(c ==1)
-            thisY = thisImg;
-            lastY = lastImg;
-    else
-            thisY = rgb2ycbcr(thisImg);
-            thisY = thisY(:,:,1);
-            lastY = rgb2ycbcr(lastImg);
-            lastY = lastY(:,:,1);
-    end
-    diff = abs(thisY-lastY);
-    MDE = sum(sum(diff))/(w*h);
-    MDEGArr(x) = MDE;
-    if mod(x,100)==0
-        fprintf('-');
-    end
-end
-MDEThresh = prctile(MDEGArr,r); % conf.RateNotInterp Partial not use interpMDEArr
-operateFlags = MDEGArr > MDEThresh;
-fprintf('>\n');
 
 %% Main loop
 for To = 2:nFrames
     OF = operateFlags(To); %%%% This is the interface
-    %$
-    OF = OF > 0.5;
     %% for enhancement
     if OF 
         imgInterpLast = interpAlg(imgSet,To);%$
         if(size(imgInterpLast,3)==1), imgInterpLast = cat(3,imgInterpLast,imgInterpLast,imgInterpLast); end
         samples_Itp = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);%$
         feat_conv_Itp = mdnet_features_convX(net_conv, imgInterpLast, samples_Itp, opts);%%
-        feat_fc_Itp = mdnet_features_fcX(net_fc, feat_conv_Itp, opts);%%
+        feat_fc_Itp = mdnet_features_fcX(net_fc, feat_conv_Itp, opts);%% 
         feat_fc_Itp = squeeze(feat_fc_Itp)';%%
         [scores_Itp,idx_Itp] = sort(feat_fc_Itp(:,2),'descend');  %%
         target_score_Itp = mean(scores_Itp(1:5));%%
