@@ -1,11 +1,11 @@
-function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_1(imgSet, init_rect,r)
+function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_2(imgSet, init_rect,r)
 %% The first amendment for the advanced VITAL. In order to generate a better
 %% demo, we fix this function by letting it record the result bbox of the 
 %% procedure that manipulates interpolated frames  
 
 %% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
 %%% THresh Test
-%%%%  THresh Test -- rate by 
+%%%%  THresh Test -- rate by argument
 run ./matconvnet/matlab/vl_setupnn ;
 addpath('./utils');
 addpath('./models');
@@ -150,8 +150,7 @@ fprintf('>\n');
 %% Main loop
 for To = 2:nFrames
     OF = operateFlags(To); %%%% This is the interface
-    %$
-    OF = OF > 0.5;
+   
     %% for enhancement
     if OF 
         imgInterpLast = interpAlg(imgSet,To);%$
