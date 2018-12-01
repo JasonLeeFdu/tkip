@@ -28,7 +28,7 @@ seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = true;
-resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','AdvValidCheckForDemo');
+resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','AdvValidCheckForDemoFth1');
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
@@ -90,9 +90,10 @@ att = [];
 numTrk=length(trackers);
 videosList = dir(datasetBase);
 videosList = videosList(3:end);
-idxVideoSet = [1,3,5]; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
-for idxVideoIdx=1:4:length(videosList) %% Here to do the paralell things
-    for thresh = 0:0.05:1
+idxVideoSet = [13,15,31,39,40,45,65,91,98,100]; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
+for idxVideoIdx=1:4:length(idxVideoSet) %% Here to do the paralell things
+    idxVideo = idxVideoSet(idxVideoIdx);
+    for thresh = 0:0.1:1
         fprintf('++++++++++++++++++++++++++++++++++++++++++++R thresh : %f ++++++++++++++++++++++++++++++++++++++++++++',thresh)
         %% get the imgSet
         videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   

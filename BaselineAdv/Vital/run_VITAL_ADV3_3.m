@@ -1,4 +1,4 @@
-function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_3(imgSet, init_rect,ratio)
+function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_3(imgSet, init_rect,localTh)
 %% The first amendment for the advanced VITAL. In order to generate a better
 %% demo, we fix this function by letting it record the result bbox of the 
 %% procedure that manipulates interpolated frames  
@@ -135,8 +135,9 @@ for To = 2:nFrames
     l = searchRect(1);t = searchRect(2);w = searchRect(3);h=searchRect(4);
     localDiff = diff(t:t+h-1,l:l+w-1);
     factor = sum(sum(localDiff)) / (w*h);
+    factor = factor / 255; %%% 非常重要  0-255  => 0-1
     MDEGArr(end+1) = factor;
-    OF = factor > ratio;
+    OF = factor > localTh;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% for enhancement
     if OF 
@@ -300,8 +301,8 @@ cx = l1 + (w1 -1)/2;
 cy = t1 + (h1 -1)/2;
 w2 = w1 * r;
 h2 = h1 * r;
-l2 = cx - (w2 - 1)/2;
-t2 = cy - (h2 - 1)/2;
+l2 = max(1,cx - (w2 - 1)/2);
+t2 = max(1,cy - (h2 - 1)/2);
 
 Wmax = W - l2 + 1;
 Hmax = H - t2 + 1;
