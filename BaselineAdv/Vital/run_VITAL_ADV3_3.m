@@ -1,4 +1,4 @@
-function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_3(imgSet, init_rect,r)
+function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_3(imgSet, init_rect,ratio)
 %% The first amendment for the advanced VITAL. In order to generate a better
 %% demo, we fix this function by letting it record the result bbox of the 
 %% procedure that manipulates interpolated frames  
@@ -110,12 +110,34 @@ tic;
 startt = toc;
 
 target_score = 2.8888888;
-
+MDEGArr(1)= 0.0;
 
 
 %% Main loop
 for To = 2:nFrames
-    OF = operateFlags(To); %%%% This is the interface
+    %% Whether need enhancement, judged by 'Local  Difference' M12011155
+    thisImg = imread(imgSet{To});
+    lastImg = imread(imgSet{To-1});
+    [h,w,c] = size(thisImg);
+    if(c ==1)
+            thisY = thisImg;
+            lastY = lastImg;
+    else
+            thisY = rgb2ycbcr(thisImg);
+            thisY = thisY(:,:,1);
+            lastY = rgb2ycbcr(lastImg);
+            lastY = lastY(:,:,1);
+    end
+    diff = abs(thisY-lastY);
+    %% 通过统计上个框周围1.5倍范围的区域的像素平均差分变化值，来判断是否使用插帧结果
+    searchRect = expandSearchArea(targetLoc,conf.MotionSearchR,h,w); %% 
+    %l = targetLoc(1);t = targetLoc(2);w = targetLoc(3);h=targetLoc(4);
+    l = searchRect(1);t = searchRect(2);w = searchRect(3);h=searchRect(4);
+    localDiff = diff(t:t+h-1,l:l+w-1);
+    factor = sum(sum(localDiff)) / (w*h);
+    MDEGArr(end+1) = factor;
+    OF = factor > ratio;
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% for enhancement
     if OF 
         imgInterpLast = interpAlg(imgSet,To);%$
@@ -266,4 +288,28 @@ endd = toc;
 duration = endd-startt;
 fps = (nFrames) / duration;
 
+end
+
+
+function rect2 = expandSearchArea(rect,r,H,W)  % lefttop widh height
+l1 = rect(1);
+t1 = rect(2);
+w1 = rect(3);
+h1 = rect(4);
+cx = l1 + (w1 -1)/2;
+cy = t1 + (h1 -1)/2;
+w2 = w1 * r;
+h2 = h1 * r;
+l2 = cx - (w2 - 1)/2;
+t2 = cy - (h2 - 1)/2;
+
+Wmax = W - l2 + 1;
+Hmax = H - t2 + 1;
+w2   = max(1,min(Wmax,w2));
+h2   = max(1,min(Hmax,h2));
+
+
+rect2 = [l2;t2;w2;h2];
+rect2 = round(rect2);
+rect2 = rect2';
 end

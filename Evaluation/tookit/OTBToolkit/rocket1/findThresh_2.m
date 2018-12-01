@@ -1,7 +1,7 @@
 % Experiment1 Try to prove that the modified module is as same as the 
 % original alg..
-
 %%
+%%用来测试，为局部算法选择阈值。
 % 1. read the database
 % 2. get the result seperately
 % 3. get the total line-graph and separate vXt chart 
@@ -160,7 +160,7 @@ for idxVideoIdx=1:4:length(videosList) %% Here to do the paralell things
             saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
             %%%
             disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-            str0 = ['[resAdv ,InterpBboxAdv,fpsAdv,MDEGArr] = run_' t.name '_' 'ADV3_2'  '(imgSet,init_rect,thresh);'];
+            str0 = ['[resAdv ,InterpBboxAdv,fpsAdv,MDEGArr] = run_' t.name '_' 'ADV3_3'  '(imgSet,init_rect,thresh);'];
             eval(str0);
             results = {};
             res = struct;

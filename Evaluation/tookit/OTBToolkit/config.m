@@ -57,6 +57,9 @@ conf.StdInterpStartEndF = conf.IdealStartEndF;
 conf.StdStartEndF = containers.Map();       
 
 conf.RateNotInterp = 30;
+conf.MotionSearchR = 1.5;
+conf.LocalMotionTh = 20.5;
+
 
 
 
