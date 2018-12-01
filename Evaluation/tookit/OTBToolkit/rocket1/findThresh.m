@@ -90,11 +90,10 @@ att = [];
 numTrk=length(trackers);
 videosList = dir(datasetBase);
 videosList = videosList(3:end);
-
-
-for thresh = 0:0.05:1
-    fprintf('++++++++++++++++++++++++++++++++++++++++++++R thresh : %f ++++++++++++++++++++++++++++++++++++++++++++',thresh)
-    for idxVideo=5:6:length(videosList) %% Here to do the paralell things
+idxVideoSet = [1,3,5]; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
+for idxVideoIdx=1:4:length(videosList) %% Here to do the paralell things
+    for thresh = 0:0.05:1
+        fprintf('++++++++++++++++++++++++++++++++++++++++++++R thresh : %f ++++++++++++++++++++++++++++++++++++++++++++',thresh)
         %% get the imgSet
         videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
         imgSet = {};
@@ -177,12 +176,10 @@ for thresh = 0:0.05:1
             results{end+1}  = res;
             save(saveAdv, 'results');
 
-
             cd (workingDirectory);
             rmpath(genpath(algWorkingDirectory));
         end
     end
 
 end
-
 
