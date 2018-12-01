@@ -1,4 +1,4 @@
-function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_2(imgSet, init_rect,r)
+function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_2(imgSet, init_rect,ratio)
 %% The first amendment for the advanced VITAL. In order to generate a better
 %% demo, we fix this function by letting it record the result bbox of the 
 %% procedure that manipulates interpolated frames  
@@ -143,7 +143,9 @@ for x = 2:nFrames
         fprintf('-');
     end
 end
-MDEThresh = prctile(MDEGArr,r); % conf.RateNotInterp Partial not use interpMDEArr
+%%%
+%  ratio -- （0,1）
+MDEThresh = prctile(MDEGArr,(100-ratio*100)); % conf.RateNotInterp Partial not use interpMDEArr
 operateFlags = MDEGArr > MDEThresh;
 fprintf('>\n');
 
