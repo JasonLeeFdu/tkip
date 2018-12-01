@@ -4,7 +4,7 @@ function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_1(imgSet, init_rect
 %% procedure that manipulates interpolated frames  
 
 %% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
-
+%%% rate by conf 
 run ./matconvnet/matlab/vl_setupnn ;
 addpath('./utils');
 addpath('./models');
