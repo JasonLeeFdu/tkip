@@ -91,7 +91,7 @@ numTrk=length(trackers);
 videosList = dir(datasetBase);
 videosList = videosList(3:end);
 idxVideoSet = [13,15,31,39,40,45,65,91,98,100]; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
-for idxVideoIdx=1:4:length(idxVideoSet) %% Here to do the paralell things
+for idxVideoIdx=4:4:length(idxVideoSet) %% Here to do the paralell things
     idxVideo = idxVideoSet(idxVideoIdx);
     for thresh = 0:0.1:1
         fprintf('++++++++++++++++++++++++++++++++++++++++++++R thresh : %f ++++++++++++++++++++++++++++++++++++++++++++',thresh)
