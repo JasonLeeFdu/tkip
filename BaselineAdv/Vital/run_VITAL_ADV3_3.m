@@ -1,4 +1,4 @@
-function [ result ,Interp_bbox,MDEGArr,fps] = run_VITAL_ADV3_3(imgSet, init_rect,localTh)
+function [ result ,Interp_bbox,MDEGArr,th,fps] = run_VITAL_ADV3_3(imgSet, init_rect,localTh)
 %% The first amendment for the advanced VITAL. In order to generate a better
 %% demo, we fix this function by letting it record the result bbox of the 
 %% procedure that manipulates interpolated frames  
@@ -111,14 +111,14 @@ startt = toc;
 
 target_score = 2.8888888;
 MDEGArr(1)= 0.0;
-
+th = localTh;
 
 %% Main loop
 for To = 2:nFrames
     %% Whether need enhancement, judged by 'Local  Difference' M12011155
     thisImg = imread(imgSet{To});
     lastImg = imread(imgSet{To-1});
-    [h,w,c] = size(thisImg);
+    [H,W,c] = size(thisImg);
     if(c ==1)
             thisY = thisImg;
             lastY = lastImg;
@@ -130,10 +130,10 @@ for To = 2:nFrames
     end
     diff = abs(thisY-lastY);
     %% 通过统计上个框周围1.5倍范围的区域的像素平均差分变化值，来判断是否使用插帧结果
-    searchRect = expandSearchArea(targetLoc,conf.MotionSearchR,h,w); %% 
+    searchRect = expandSearchArea(targetLoc,conf.MotionSearchR,H,W); %% 
     %l = targetLoc(1);t = targetLoc(2);w = targetLoc(3);h=targetLoc(4);
     l = searchRect(1);t = searchRect(2);w = searchRect(3);h=searchRect(4);
-    localDiff = diff(t:t+h-1,l:l+w-1);
+    localDiff = diff(max(1,t):min(t+h-1,H),max(1,l):min(W,l+w-1));
     factor = sum(sum(localDiff)) / (w*h);
     factor = factor / 255; %%% 非常重要  0-255  => 0-1
     MDEGArr(end+1) = factor;

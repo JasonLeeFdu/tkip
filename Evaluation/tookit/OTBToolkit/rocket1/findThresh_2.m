@@ -20,6 +20,7 @@ addpath(genpath(AdvBaselinePath));
 
 
 conf = config;
+loconf = localConfig();
 testAlg = {'VITAL'};
 targetSet = 'OTB100';
 trackers=ConfigMatTrackers;
@@ -27,7 +28,7 @@ seqs=ConfigSeqs100;
 seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
-overWrite = true;
+overWrite = false;
 resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','AdvValidCheckForDemoFth2');
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
@@ -66,28 +67,17 @@ attrNames  = {'光照变化, ','平面外旋转, ','尺度变化, ','遮挡, ','
 attrNamesEnglish = {'IV','OPR','SV','OCC','DEF','MB','FM','IPR','OV','BC','LR'};
 attPath = [BASE_PATH 'Evaluation/tookit/OTBToolkit' '/anno/att/']; % The folder that contains the annotation files for sequence attributes
 attStringSet={};
+
 att = [];
-% for idxSeq=1:numSeq
-%     s = seqs{idxSeq};
-%     nameSeqAll{idxSeq}=s.name;
-%     attributeFileName = [attPath lower(s.name) '.txt'];
-%     tmp = load(attributeFileName);
-%     recIdx = find(tmp);
-%     att(idxSeq,:)= tmp;
-%     recStr = '';
-%     for i = 1:length(recIdx)
-%         recStr = strcat(recStr,attrNames{recIdx(i)});
-%     end
-%     attStringSet{end+1} = recStr;
-% end
+
 
 numTrk=length(trackers);
 videosList = dir(datasetBase);
 videosList = videosList(3:end);
-idxVideoSet = [13,15,31,39,40,45,65,91,98,100]; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
-for idxVideoIdx=1:4:length(idxVideoSet) %% Here to do the paralell things
+idxVideoSet = loconf.idxVideoSet; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
+for idxVideoIdx=3:3:length(idxVideoSet) %% Here to do the paralell things
     idxVideo = idxVideoSet(idxVideoIdx);
-    for localTh = 0:0.02:0.2
+    for localTh = loconf.thArr2
         fprintf('++++++++++++++++++++++++++++++++++++++++++++R thresh : %f ++++++++++++++++++++++++++++++++++++++++++++',localTh)
         %% get the imgSet
         videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
@@ -119,8 +109,6 @@ for idxVideoIdx=1:4:length(idxVideoSet) %% Here to do the paralell things
         for idxTrk=1:numTrk     %For every tracker
             t = trackers{idxTrk};   % t is the name of the tracker
             resPathBaseTrk = resPathBase;       
-
-
             % add the path
             algWorkingDirectory = AdvBaselinePath;
             cd (algWorkingDirectory);
@@ -168,6 +156,7 @@ for idxVideoIdx=1:4:length(idxVideoSet) %% Here to do the paralell things
             res.res        = resAdv;
             res.InterpBbox = InterpBboxAdv;
             res.MDE     = MDEGArr;
+            
             results{end+1}  = res;
             save(saveAdv, 'results');
 

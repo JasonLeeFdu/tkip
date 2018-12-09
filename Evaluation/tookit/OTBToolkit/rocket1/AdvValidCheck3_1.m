@@ -27,7 +27,7 @@ seqs=ConfigSeqs100;
 seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
-overWrite = true;
+overWrite = false;
 resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','AdvValidCheckForDemo');
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
@@ -93,7 +93,7 @@ videosList = videosList(3:end);
 
 
 
-for idxVideo=1%1:6:length(videosList) %% Here to do the paralell things
+for idxVideo=1:length(videosList) %% Here to do the paralell things
 
     %% get the imgSet
     videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
@@ -204,7 +204,9 @@ GenPerfMat3(seqs, trackers, 'OPE', resPathBase, resPathBase,downSampleTypeSet{1}
 GenPerfMat3(seqs, trackers, 'OPE', resPathBase, resPathBase,downSampleTypeSet{2});
 deltaMetric = zeros(numSeq,numTrk);
 resIntetmediate = {};
+
 attStringSet = attStringSet';
+
 for idxDownSampleType = 1:length(downSampleTypeSet)
     additionalNameTag = downSampleTypeSet{idxDownSampleType};
     for idxMetricType = 1:length(metricTypeSet)
@@ -219,7 +221,7 @@ for idxDownSampleType = 1:length(downSampleTypeSet)
         % error_OPE_Ori   overlap_OPE_Ori
         % error_OPE_Adv    %overlap_OPE_Adv 
         load(dataName); % get the aveSuccessRatePlot OF: 
-        tmpMtrx = aveSuccessRatePlot; % #Movies * #Baseline * #threshold
+        tmpMtrx = aveSuccessRatePlot; %  #Baseline * #Movies * #threshold
         [~,s1,s2] = size(tmpMtrx);
         tmpMtrx = reshape(tmpMtrx,[s1,s2]);
         tmpMtrx = mean(tmpMtrx,2);     % AUC of  % #Movies * #Baseline 
