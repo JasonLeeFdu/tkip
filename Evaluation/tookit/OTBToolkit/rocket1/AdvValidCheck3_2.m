@@ -163,9 +163,15 @@ for idxVideo=1:length(videosList) %% Here to do the paralell things
         saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
         %%%
         disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
+<<<<<<< HEAD
         str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_2'  '(imgSet,init_rect);'];
         eval(str0);
         results = {}; 
+=======
+        str0 = ['[resAdv ,InterpBboxAdv,fpsAdv,MDEGArr] = run_' t.name '_' 'ADV3_2'  '(imgSet,init_rect);'];
+        eval(str0);
+        results = {};
+>>>>>>> 587027dff6e9bdbd979709772734c73b21ebbf7a
         res = struct;
         res.startFrame = startFrame;
         res.endFrame   = endFrame;

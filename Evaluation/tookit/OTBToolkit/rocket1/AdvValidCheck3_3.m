@@ -93,7 +93,11 @@ videosList = videosList(3:end);
 
 
 
+<<<<<<< HEAD
 for idxVideo=2:6:length(videosList) %% Here to do the paralell things
+=======
+for idxVideo=6:6:length(videosList) %% Here to do the paralell things
+>>>>>>> 587027dff6e9bdbd979709772734c73b21ebbf7a
 
     %% get the imgSet
     videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
