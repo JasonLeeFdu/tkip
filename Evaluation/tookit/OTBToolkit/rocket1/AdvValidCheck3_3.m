@@ -18,7 +18,7 @@ AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuid
 addpath(genpath(OTBToolkitBase));
 addpath(genpath(AdvBaselinePath));
 
-
+BEST_TH = 0.06;
 conf = config;
 testAlg = {'VITAL'};
 targetSet = 'OTB100';
@@ -93,7 +93,7 @@ videosList = videosList(3:end);
 
 
 
-for idxVideo=1:length(videosList) %% Here to do the paralell things
+for idxVideo=2:6:length(videosList) %% Here to do the paralell things
 
     %% get the imgSet
     videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
@@ -163,9 +163,9 @@ for idxVideo=1:length(videosList) %% Here to do the paralell things
         saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
         %%%
         disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-        str0 = ['[resAdv ,InterpBboxAdv,fpsAdv,MDEGArr] = run_' t.name '_' 'ADV3_3'  '(imgSet,init_rect);'];
-        eval(str0);
-        results = {};
+        str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_3' '(imgSet,init_rect,' num2str(BEST_TH) ');'];
+        eval(str0);                       
+        results = {}; 
         res = struct;
         res.startFrame = startFrame;
         res.endFrame   = endFrame;
@@ -175,13 +175,14 @@ for idxVideo=1:length(videosList) %% Here to do the paralell things
         res.anno       = rect_anno;
         res.res        = resAdv;
         res.InterpBbox = InterpBboxAdv;
+        res.th = th;
         res.MDE     = MDEGArr;
         results{end+1}  = res;
         save(saveAdv, 'results');
         
         if IF_RUN_ORI
             disp([ 'AdvBaseline Validation check:ORI' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-            str = ['[resOri,fpsOri] = run_' t.name '(imgSet,init_rect);'];
+            str = ['[resOri,fpsOri] = run_' t.name '(imgSet,init_rect,' num2str(BEST_TH) ');'];
             eval(str); 
             results = {};
             res = struct;

@@ -93,7 +93,7 @@ videosList = videosList(3:end);
 
 
 
-for idxVideo=1%1:6:length(videosList) %% Here to do the paralell things
+for idxVideo=1:6:length(videosList) %% Here to do the paralell things
 
     %% get the imgSet
     videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
@@ -173,6 +173,7 @@ for idxVideo=1%1:6:length(videosList) %% Here to do the paralell things
         res.type       = 'rect';
         res.fps        =  fpsAdv;
         res.anno       = rect_anno;
+        res.th         = th;
         res.res        = resAdv;
         res.InterpBbox = InterpBboxAdv;
         res.MDE     = MDEAdv;
@@ -192,6 +193,7 @@ for idxVideo=1%1:6:length(videosList) %% Here to do the paralell things
             res.fps        =  fpsOri;
             res.anno       = rect_anno;
             res.res        = resOri;
+            
             results{end+1}  = res;
             save(saveOri, 'results');
         end

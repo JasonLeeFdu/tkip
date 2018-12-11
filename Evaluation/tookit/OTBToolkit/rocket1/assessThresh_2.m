@@ -1,5 +1,4 @@
 
-
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original','OTB100');
 if ~strcmp(datasetBase(end),'/')
     datasetBase = strcat(datasetBase,'/');
