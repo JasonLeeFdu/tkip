@@ -167,4 +167,3 @@ for idxVideoIdx=1:length(idxVideoSet) %% Here to do the paralell things
     end
 
 end
-
