@@ -5,12 +5,9 @@ config = [];
 config.idxVideoSet = [13,15,31,39,40,45,65,91,98,100]; 
 config.thArr1 = 0:0.1:1;
 config.thArr2 = 0:0.02:0.2;
-
+config.thArr3 = 0:0.005:0.05;
 
 config.THRESHOLDSETOVERLAP = 0:0.05:1;
-
-
-
 
 
 end

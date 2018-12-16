@@ -27,7 +27,7 @@ trackers = [trackersPy,trackersMat];
 
 metricTypeSet = {'error', 'overlap'};
 evalTypeSet = {'OPE'};
-rankingType = 'AUC'; %AUC, threshold AUC
+rankingType = 'threshold'; %AUC, threshold AUC
 rankNum = 10;%number of plots to show
 drawAttrGraph= false;
 % start to config the seq part and set the path of the tracking res  ConfigSeqs
@@ -182,9 +182,9 @@ for i=1:length(metricTypeSet) % set error & overlap
         
         % If the performance Mat file, dataName, does not exist, it will call
         % genPerfMat to generate the file.
-        if ~exist(dataName)
-            GenPerfMat2(seqs, trackers, evalType, perfMatPath,trkResPath,nameTrkAll); %% send in all the trackers and seqs
-        end        
+        %if ~exist(dataName)
+        GenPerfMat2(seqs, trackers, evalType, perfMatPath,trkResPath,nameTrkAll); %% send in all the trackers and seqs
+        %end        
 
         load(dataName);
         numTrk = size(aveSuccessRatePlot,1);        

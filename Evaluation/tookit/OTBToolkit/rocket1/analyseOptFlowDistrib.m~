@@ -1,0 +1,31 @@
+FLOW_BASE = '/home/winston/Datasets/Tracking/Original/OTB100_optFlow';
+vnDir = dir(FLOW_BASE);
+vnames = {};
+bin = 0.0005:0.001:0.9995;
+
+for i = 3:length(vnames)
+    vnames{end+1} = vnDir(i).name ;    
+end
+
+for i = 1:length(vnames)    %every clip
+    frDir = dir(fullfile(FLOW_BASE,vnames));
+    frNames = {};
+    for jj = 3:length(frDir)
+        frNames{end+1} = frDir(jj).name;
+    end
+    for j = 1:length(frNames)
+       fn = fullfile(FLOW_BASE,vnames{i},frNames{j});
+       load(fn);
+       % optFlow
+       OptFlowAmplitude = sqrt(optFlow(:,:,1).^2 + optFlow(:,:,2).^2);
+       
+        
+        
+    end
+        
+    
+end
+
+
+
+

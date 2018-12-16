@@ -1,7 +1,7 @@
 % Experiment1 Try to prove that the modified module is as same as the 
 % original alg..
-%%用来测试，为全局选个阈值
 %%
+%%用来测试，为局部光流算法选择阈值。  run_VITAL_ADV3_4
 % 1. read the database
 % 2. get the result seperately
 % 3. get the total line-graph and separate vXt chart 
@@ -28,8 +28,9 @@ seqs=ConfigSeqs100;
 seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
-overWrite = true;
-resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','AdvValidCheckForDemoFth1');
+overWrite = false;
+%%% 第三次搜索阈值，用来查找光流阈值
+resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','AdvValidCheckForDemoFth3Opt');
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
@@ -57,12 +58,6 @@ for i = 1:length(seqs)
 end
 
 
-for i = 1:length(testAlg)
-    resSubPath = fullfile(resPathBase,testAlg{i}); %%%
-    if ~exist(resSubPath,'dir')
-       mkdir(resSubPath);       
-    end
-end
 
 for i = 1:length(testAlg)
     if ~ismember(trackers{i}.name,testAlg)
@@ -73,18 +68,18 @@ attrNames  = {'光照变化, ','平面外旋转, ','尺度变化, ','遮挡, ','
 attrNamesEnglish = {'IV','OPR','SV','OCC','DEF','MB','FM','IPR','OV','BC','LR'};
 attPath = [BASE_PATH 'Evaluation/tookit/OTBToolkit' '/anno/att/']; % The folder that contains the annotation files for sequence attributes
 attStringSet={};
+
 att = [];
 
 
 numTrk=length(trackers);
 videosList = dir(datasetBase);
 videosList = videosList(3:end);
-
-idxVideoSet = [13,15,31,39,40,45,65,91,98,100]; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
+idxVideoSet = loconf.idxVideoSet; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
 for idxVideoIdx=1:length(idxVideoSet) %% Here to do the paralell things
     idxVideo = idxVideoSet(idxVideoIdx);
-    for thresh = config.thArr1
-        fprintf('++++++++++++++++++++++++++++++++++++++++++++R thresh : %f ++++++++++++++++++++++++++++++++++++++++++++',thresh)
+    for localOptTh = loconf.thArr3
+        fprintf('++++++++++++++++++++++++++++++++++++++++++++R thresh : %f ++++++++++++++++++++++++++++++++++++++++++++',localOptTh)
         %% get the imgSet
         videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
         imgSet = {};
@@ -115,14 +110,12 @@ for idxVideoIdx=1:length(idxVideoSet) %% Here to do the paralell things
         for idxTrk=1:numTrk     %For every tracker
             t = trackers{idxTrk};   % t is the name of the tracker
             resPathBaseTrk = resPathBase;       
-
-
             % add the path
             algWorkingDirectory = AdvBaselinePath;
             cd (algWorkingDirectory);
             addpath(genpath(algWorkingDirectory));
             % validate the results  
-            resAdvFileSaveName = sprintf('%s_%s_Adv__%f.mat',videosList(idxVideo).name,t.name,thresh);
+            resAdvFileSaveName = sprintf('%s_%s_Adv__%f.mat',videosList(idxVideo).name,t.name,localOptTh);
             if exist(fullfile(resPathBase,resAdvFileSaveName),'file')  && (~overWrite)
                      fprintf([ 'Sanity check --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
                      fprintf(' is DONE! \n'); 
@@ -151,7 +144,7 @@ for idxVideoIdx=1:length(idxVideoSet) %% Here to do the paralell things
             saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
             %%%
             disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-            str0 = ['[resAdv ,InterpBboxAdv,fpsAdv,MDEGArr] = run_' t.name '_' 'ADV3_2'  '(imgSet,init_rect,thresh);'];
+            str0 = ['[resAdv ,InterpBboxAdv,fpsAdv,MDEGArr] = run_' t.name '_' 'ADV3_4'  '(imgSet,init_rect,localOptTh);'];
             eval(str0);
             results = {};
             res = struct;
@@ -164,8 +157,10 @@ for idxVideoIdx=1:length(idxVideoSet) %% Here to do the paralell things
             res.res        = resAdv;
             res.InterpBbox = InterpBboxAdv;
             res.MDE     = MDEGArr;
+            
             results{end+1}  = res;
             save(saveAdv, 'results');
+
             cd (workingDirectory);
             rmpath(genpath(algWorkingDirectory));
         end
