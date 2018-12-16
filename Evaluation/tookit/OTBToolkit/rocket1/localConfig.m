@@ -7,9 +7,7 @@ config.thArr1 = 0:0.1:1;
 config.thArr2 = 0:0.02:0.2;
 config.thArr3 = 0:0.003:0.06;
 
-config.THRESHOLDSETOVERLAP = 0:0.05:1;
-
-
+config.THRESHOLDSETOVERLAP = 0:0.01:0.2;
 end
 
 
