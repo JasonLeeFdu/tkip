@@ -45,13 +45,9 @@ for thresh = lcf.thArr3
 end
 
 figure;
-plot(lcf.thArr2,avgAUC_th_Arr);
+plot(lcf.thArr3,avgAUC_th_Arr);
 axis([0.0 0.2 0.0 1.0])         %%%$$$ 这个地方到时候需要进行修改，以方便展示
-title('10个代表视频的IOU曲线AUC平均值，算法：局部差分，大运动插帧');
+title('10个代表视频的IOU曲线AUC平均值，算法：局部光流，大运动插帧');
 xlabel('需要插帧的运动指标阈值');ylabel('十个视频平均IOU曲线AUC值');
 legend('局部差分');
-
-
-
-
 

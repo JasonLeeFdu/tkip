@@ -76,7 +76,7 @@ numTrk=length(trackers);
 videosList = dir(datasetBase);
 videosList = videosList(3:end);
 idxVideoSet = loconf.idxVideoSet; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
-for idxVideoIdx=1:length(idxVideoSet) %% Here to do the paralell things
+for idxVideoIdx=1:6:length(idxVideoSet) %% Here to do the paralell things
     idxVideo = idxVideoSet(idxVideoIdx);
     for localOptTh = loconf.thArr3
         fprintf('++++++++++++++++++++++++++++++++++++++++++++R thresh : %f ++++++++++++++++++++++++++++++++++++++++++++',localOptTh)
@@ -144,19 +144,20 @@ for idxVideoIdx=1:length(idxVideoSet) %% Here to do the paralell things
             saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
             %%%
             disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-            str0 = ['[resAdv ,InterpBboxAdv,fpsAdv,MDEGArr] = run_' t.name '_' 'ADV3_4'  '(imgSet,init_rect,localOptTh);'];
-            eval(str0);
+            str0 = ['[result ,Interp_bbox,MDEGArr,th,fps ] = run_' t.name '_' 'ADV3_4'  '(imgSet,init_rect,localOptTh);'];
+            eval(str0); 
             results = {};
             res = struct;
             res.startFrame = startFrame;
             res.endFrame   = endFrame;
             res.len        = endFrame - startFrame + 1;
             res.type       = 'rect';
-            res.fps        =  fpsAdv;
+            res.fps        =  fps;
             res.anno       = rect_anno;
-            res.res        = resAdv;
-            res.InterpBbox = InterpBboxAdv;
+            res.res        = result;
+            res.InterpBbox = Interp_bbox;
             res.MDE     = MDEGArr;
+            res.th = th;
             
             results{end+1}  = res;
             save(saveAdv, 'results');

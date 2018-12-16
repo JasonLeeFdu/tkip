@@ -123,7 +123,7 @@ for To = 2:nFrames
     diff_Y = diff_T(:,:,2);
     diff   = sqrt(diff_X.^2 + diff_Y.^2);
     %% 通过统计上个框周围1.5倍范围的区域的像素平均差分变化值，来判断是否使用插帧结果
-    searchRect = expandSearchArea(targetLoc,conf.MotionSearchR,H,W); %% 
+    searchRect = targetLoc;%expandSearchArea(targetLoc,conf.MotionSearchR,H,W); %% 
     %l = targetLoc(1);t = targetLoc(2);w = targetLoc(3);h=targetLoc(4);
     l = searchRect(1);t = searchRect(2);w = searchRect(3);h=searchRect(4);
     localDiff = diff(max(1,t):min(t+h-1,H),max(1,l):min(W,l+w-1));
