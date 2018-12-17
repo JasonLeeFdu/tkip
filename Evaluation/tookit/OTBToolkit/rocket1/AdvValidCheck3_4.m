@@ -15,7 +15,7 @@ AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuid
 addpath(genpath(OTBToolkitBase));
 addpath(genpath(AdvBaselinePath));
 
-BEST_TH = 0.05;
+BEST_TH = 0.015;
 conf = config;
 testAlg = {'VITAL'};
 targetSet = 'OTB100';

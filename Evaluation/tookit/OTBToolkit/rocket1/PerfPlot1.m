@@ -27,7 +27,7 @@ trackers = [trackersPy,trackersMat];
 
 metricTypeSet = {'error', 'overlap'};
 evalTypeSet = {'OPE'};
-rankingType = 'AUC'; %AUC, threshold AUC
+rankingType = 'threshold'; %AUC, threshold AUC
 rankNum = 10;%number of plots to show
 drawAttrGraph= false;
 % start to config the seq part and set the path of the tracking res  ConfigSeqs
