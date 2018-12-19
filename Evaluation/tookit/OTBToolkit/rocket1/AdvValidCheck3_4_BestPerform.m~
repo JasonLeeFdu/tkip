@@ -30,7 +30,7 @@ datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
 IF_RUN_ORI = false;
-MAX_TRAIL_TIMES = 10;
+MAX_TRAIL_TIMES = 2;
 
 
 if ~strcmp(resPathBase(end),'/')
@@ -52,7 +52,7 @@ end
 for i = 1:length(seqs)
     seqNameBox {end+1} = seqs{i}.name;
 end
-u
+
 
 for i = 1:length(testAlg)
     resSubPath = fullfile(resPathBase,testAlg{i}); %%%
@@ -108,8 +108,10 @@ videosList = videosList(3:end);
 
 
 
-for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多进程)  
+for idxVideo=2:length(videosList) %% 对于每一个视频(此处可以使用多进程)  
+     disp([ '==================AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
     for trailTimes = 1:MAX_TRAIL_TIMES
+        disp([]);
              %% get the imgSet
         videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
         imgSet = {};
@@ -176,7 +178,6 @@ for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多
             %%%
             saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
             %%%
-            disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
             str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_4' '(imgSet,init_rect,' num2str(BEST_TH) ');'];
             eval(str0);                       
             results = {}; 
@@ -207,10 +208,16 @@ for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多
     end
     for kk = 1:MAX_TRAIL_TIMES
         [IOU_AUC,Precs_Thres] = calculateIOU_N_Precision(resFnSet{kk});
-        IOUArr(kk) = IOU_AUG;
+        IOUArr(kk) = IOU_AUC;
         PrecArr(kk) = Precs_Thres;
     end
     Metyrc = (IOUArr + PrecArr)/2;
+    [argvalue, argmax] = max(Metyrc);
+    
+    stdResFn = fullfile( resPathBase , sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,t.name));
+    bestResFn = fullfile( resPathBase , sprintf('%s_%s_Adv(%d).mat',videosList(idxVideo).name,t.name,argmax));
+    copyfile(bestResFn, stdResFn);
+    % remove the (kk) files
     
     
 

@@ -15,7 +15,7 @@ AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuid
 addpath(genpath(OTBToolkitBase));
 addpath(genpath(AdvBaselinePath));
 
-BEST_TH = 0.03;
+BEST_TH = 0.0052;
 conf = config;
 testAlg = {'VITAL'};
 targetSet = 'OTB100';
@@ -91,7 +91,7 @@ videosList = videosList(3:end);
 
 
 
-for idxVideo=1:length(videosList) %% Here to do the paralell things
+for idxVideo=1:8:length(videosList) %% Here to do the paralell things
     %% get the imgSet
     videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
     imgSet = {};

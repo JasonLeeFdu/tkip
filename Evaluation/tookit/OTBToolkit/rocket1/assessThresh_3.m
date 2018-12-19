@@ -7,7 +7,7 @@ videosList = dir(datasetBase);
 videosList = videosList(3:end);
 
 lcf = localConfig();
-avgAUC_th_Arr = zeros(length(lcf.thArr1),1);
+avgAUC_th_Arr = zeros(length(lcf.thArr3),1);
 videoNum  = length(lcf.idxVideoSet);
 %%%
 ResPath   = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results/AdvValidCheckForDemoFth3Opt/';
@@ -46,7 +46,7 @@ end
 
 figure;
 plot(lcf.thArr3,avgAUC_th_Arr);
-axis([0.0 0.06 0.0 1.0])         %%%$$$ 这个地方到时候需要进行修改，以方便展示
+axis([min(lcf.thArr3) max(lcf.thArr3) 0.0 1.0])         %%%$$$ 这个地方到时候需要进行修改，以方便展示
 title('10个代表视频的IOU曲线AUC平均值，算法：局部光流，大运动插帧');
 xlabel('需要插帧的运动指标阈值');ylabel('十个视频平均IOU曲线AUC值');
 legend('局部差分');

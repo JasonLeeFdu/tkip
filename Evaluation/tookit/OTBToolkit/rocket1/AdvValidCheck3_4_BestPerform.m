@@ -109,7 +109,9 @@ videosList = videosList(3:end);
 
 
 for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多进程)  
+     disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
     for trailTimes = 1:MAX_TRAIL_TIMES
+        disp(['====> ' num2str(trailTimes)   ]);
              %% get the imgSet
         videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
         imgSet = {};
@@ -151,7 +153,7 @@ for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多
             resAdvFileSaveName = sprintf('%s_%s_Adv(%d).mat',videosList(idxVideo).name,t.name,trailTimes);
             if exist(fullfile(resPathBase,resAdvFileSaveName),'file')  && (~overWrite)
                      fprintf([ 'Best Result --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
-                     fprintf(' is DONE! \n'); 
+                     fprintf(' %d is DONE! \n',trailTimes); 
                     continue;
             end
             if exist(resAdvFileSaveName,'file') && (~overWrite)
@@ -167,7 +169,7 @@ for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多
                            fprintf(' the results are fixed! \n');
                        end     
                      fprintf([downSampleType ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
-                     fprintf(' is DONE! \n'); 
+                     fprintf(' %d is DONE! \n',trailTimes); 
                     continue;
             end
             results = {};
@@ -176,7 +178,6 @@ for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多
             %%%
             saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
             %%%
-            disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
             str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_4' '(imgSet,init_rect,' num2str(BEST_TH) ');'];
             eval(str0);                       
             results = {}; 
@@ -197,6 +198,7 @@ for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多
             rmpath(genpath(algWorkingDirectory));
         end 
     end
+    disp('');
     %% After doing the OPE   calculateIOU_N_Precision
     resFnSet = {};
     IOUArr   = [];
@@ -207,12 +209,25 @@ for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多
     end
     for kk = 1:MAX_TRAIL_TIMES
         [IOU_AUC,Precs_Thres] = calculateIOU_N_Precision(resFnSet{kk});
-        IOUArr(kk) = IOU_AUG;
+        IOUArr(kk) = IOU_AUC;
         PrecArr(kk) = Precs_Thres;
     end
     Metyrc = (IOUArr + PrecArr)/2;
     [argvalue, argmax] = max(Metyrc);
     
+    stdResFn = fullfile( resPathBase , sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,t.name));
+    bestResFn = fullfile( resPathBase , sprintf('%s_%s_Adv(%d).mat',videosList(idxVideo).name,t.name,argmax));
+    copyfile(bestResFn, stdResFn);
+    % remove the (kk) files
+    for kk = 1:length(resFnSet)
+        delete(resFnSet{kk});
+    end
+    % inject statistic
+    load(stdResFn);
+    results{1,1}.IOUArr = IOUArr;    
+    results{1,1}.PrecArr = PrecArr;
+    save(stdResFn,'results');
+    disp('----------------------------------------------------');
 
 end
 downSampleTypeSet = {'Ori','Adv'};
