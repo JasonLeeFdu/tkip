@@ -1,16 +1,13 @@
 % Experiment1 Try to prove that the modified module is as same as the 
 % original alg..
+
 %%
-%%用来测试，为局部光流算法选择阈值。  run_VITAL_ADV3_4
 % 1. read the database
 % 2. get the result seperately
 % 3. get the total line-graph and separate vXt chart 
 %%
 
-%% The fixed version that calls run_VITAL_Adv1 funtion to track while 
-%% record all the bbox of the whole interpolated 
-%% All we have to run is adv because we already have the results of the ori-method
-%% (But this time we would like to do a sanity check of the alg code)
+%%  就是用来跑光流增强算法的！
 
 
 OTBToolkitBase = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/OTBToolkit';
@@ -18,9 +15,8 @@ AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuid
 addpath(genpath(OTBToolkitBase));
 addpath(genpath(AdvBaselinePath));
 
-
+BEST_TH = 0.03;
 conf = config;
-loconf = localConfig();
 testAlg = {'VITAL'};
 targetSet = 'OTB100';
 trackers=ConfigMatTrackers;
@@ -29,12 +25,12 @@ seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
-%%% 第三次搜索阈值，用来查找光流阈值
-resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','AdvValidCheckForDemoFth3Opt');
+resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','MotionDiffOpt1_Best');
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
 IF_RUN_ORI = false;
+MAX_TRAIL_TIMES = 10;
 
 
 if ~strcmp(resPathBase(end),'/')
@@ -56,8 +52,14 @@ end
 for i = 1:length(seqs)
     seqNameBox {end+1} = seqs{i}.name;
 end
+u
 
-
+for i = 1:length(testAlg)
+    resSubPath = fullfile(resPathBase,testAlg{i}); %%%
+    if ~exist(resSubPath,'dir')
+       mkdir(resSubPath);       
+    end
+end
 
 for i = 1:length(testAlg)
     if ~ismember(trackers{i}.name,testAlg)
@@ -68,20 +70,47 @@ attrNames  = {'光照变化, ','平面外旋转, ','尺度变化, ','遮挡, ','
 attrNamesEnglish = {'IV','OPR','SV','OCC','DEF','MB','FM','IPR','OV','BC','LR'};
 attPath = [BASE_PATH 'Evaluation/tookit/OTBToolkit' '/anno/att/']; % The folder that contains the annotation files for sequence attributes
 attStringSet={};
-
 att = [];
-
+% for idxSeq=1:numSeq
+%     s = seqs{idxSeq};
+%     nameSeqAll{idxSeq}=s.name;
+%     attributeFileName = [attPath lower(s.name) '.txt'];
+%     tmp = load(attributeFileName);
+%     recIdx = find(tmp);
+%     att(idxSeq,:)= tmp;
+%     recStr = '';
+%     for i = 1:length(recIdx)
+%         recStr = strcat(recStr,attrNames{recIdx(i)});
+%     end
+%     attStringSet{end+1} = recStr;
+% end
 
 numTrk=length(trackers);
 videosList = dir(datasetBase);
 videosList = videosList(3:end);
-idxVideoSet = loconf.idxVideoSet; %按照官网的标注精选十个视频，覆盖所有的标签，七个视频多标签，三个视频集中于快速运动尺度变化外观变化，，时长较长
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 针对每一个视频
+% 1.首先进行10次运算
+% >  循环求解，注意保存新的文件名(非标准文件名，例如Bike_VITAL_Adv(1).mat)
+%
+% 2.然后找到里面效果最好的，并统计算法对于该算法的方差
+% >  便利每一个文件，计算其AUC+Median,以此作为标准筛选最大的文件
+% >> 顺便记录统计每一个视频的，每一次结果的AUC、Median，然后求出每一个视频的AUC、Median的方差、均值(MOVIE x [AUC Median] x [均值 方差])
+%
+% 3.选择这个作为最终结果，进行下一个视频
+% >  对文件进行拷贝，生成标准文件，然后进行所有的删除
+% 
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for idxVideoIdx=3:6:length(idxVideoSet) %% Here to do the paralell things
-    idxVideo = idxVideoSet(idxVideoIdx);
-    for localOptTh = loconf.thArr3
-        fprintf('++++++++++++++++++++++++++++++++++++++++++++R thresh : %f ++++++++++++++++++++++++++++++++++++++++++++',localOptTh)
-        %% get the imgSet
+
+
+
+
+
+for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多进程)  
+    for trailTimes = 1:MAX_TRAIL_TIMES
+             %% get the imgSet
         videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
         imgSet = {};
         imagesInfo = dir(videoClip);  
@@ -111,14 +140,17 @@ for idxVideoIdx=3:6:length(idxVideoSet) %% Here to do the paralell things
         for idxTrk=1:numTrk     %For every tracker
             t = trackers{idxTrk};   % t is the name of the tracker
             resPathBaseTrk = resPathBase;       
+
+
             % add the path
             algWorkingDirectory = AdvBaselinePath;
             cd (algWorkingDirectory);
             addpath(genpath(algWorkingDirectory));
             % validate the results  
-            resAdvFileSaveName = sprintf('%s_%s_Adv__%f.mat',videosList(idxVideo).name,t.name,localOptTh);
+            resOriFileSaveName = sprintf('%s_%s_Ori.mat',videosList(idxVideo).name,t.name);      
+            resAdvFileSaveName = sprintf('%s_%s_Adv(%d).mat',videosList(idxVideo).name,t.name,trailTimes);
             if exist(fullfile(resPathBase,resAdvFileSaveName),'file')  && (~overWrite)
-                     fprintf([ 'Sanity check --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
+                     fprintf([ 'Best Result --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
                      fprintf(' is DONE! \n'); 
                     continue;
             end
@@ -145,27 +177,71 @@ for idxVideoIdx=3:6:length(idxVideoSet) %% Here to do the paralell things
             saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
             %%%
             disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-            str0 = ['[result ,Interp_bbox,MDEGArr,th,fps ] = run_' t.name '_' 'ADV3_4'  '(imgSet,init_rect,localOptTh);'];
-            eval(str0); 
-            results = {};
+            str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_4' '(imgSet,init_rect,' num2str(BEST_TH) ');'];
+            eval(str0);                       
+            results = {}; 
             res = struct;
             res.startFrame = startFrame;
             res.endFrame   = endFrame;
             res.len        = endFrame - startFrame + 1;
             res.type       = 'rect';
-            res.fps        =  fps;
+            res.fps        =  fpsAdv;
             res.anno       = rect_anno;
-            res.res        = result;
-            res.InterpBbox = Interp_bbox;
-            res.MDE     = MDEGArr;
+            res.res        = resAdv;
+            res.InterpBbox = InterpBboxAdv;
             res.th = th;
-            
+            res.MDE     = MDEGArr;
             results{end+1}  = res;
             save(saveAdv, 'results');
-
             cd (workingDirectory);
             rmpath(genpath(algWorkingDirectory));
-        end
+        end 
     end
+    %% After doing the OPE   calculateIOU_N_Precision
+    resFnSet = {};
+    IOUArr   = [];
+    PrecArr  = [];
+    Metyrc   = [];
+    for kk = 1:MAX_TRAIL_TIMES
+        resFnSet{kk} = fullfile( resPathBase , sprintf('%s_%s_Adv(%d).mat',videosList(idxVideo).name,t.name,kk));
+    end
+    for kk = 1:MAX_TRAIL_TIMES
+        [IOU_AUC,Precs_Thres] = calculateIOU_N_Precision(resFnSet{kk});
+        IOUArr(kk) = IOU_AUG;
+        PrecArr(kk) = Precs_Thres;
+    end
+    Metyrc = (IOUArr + PrecArr)/2;
+    
+    
 
 end
+downSampleTypeSet = {'Ori','Adv'};
+GenPerfMat3(seqs, trackers, 'OPE', resPathBase, resPathBase,downSampleTypeSet{1});
+GenPerfMat3(seqs, trackers, 'OPE', resPathBase, resPathBase,downSampleTypeSet{2});
+deltaMetric = zeros(numSeq,numTrk);
+resIntetmediate = {};
+
+attStringSet = attStringSet';
+
+for idxDownSampleType = 1:length(downSampleTypeSet)
+    additionalNameTag = downSampleTypeSet{idxDownSampleType};
+    for idxMetricType = 1:length(metricTypeSet)
+        metricType = metricTypeSet{idxMetricType};
+        plotType = [metricType '_OPE'];
+        perfMatPath = resPathBase;
+        if ~ strcmp(additionalNameTag,'')
+            dataName = [perfMatPath 'aveSuccessRatePlot_' num2str(numTrk) 'alg_'  plotType '_' additionalNameTag '.mat'];
+        else
+            dataName = [perfMatPath 'aveSuccessRatePlot_' num2str(numTrk) 'alg_'  plotType '.mat'];
+        end
+        % error_OPE_Ori   overlap_OPE_Ori
+        % error_OPE_Adv    %overlap_OPE_Adv 
+        load(dataName); % get the aveSuccessRatePlot OF: 
+        tmpMtrx = aveSuccessRatePlot; %  #Baseline * #Movies * #threshold
+        [~,s1,s2] = size(tmpMtrx);
+        tmpMtrx = reshape(tmpMtrx,[s1,s2]);
+        tmpMtrx = mean(tmpMtrx,2);     % AUC of  % #Movies * #Baseline 
+        resIntetmediate{end+1} = tmpMtrx; % 
+   end
+end
+fprintf('结束！');
