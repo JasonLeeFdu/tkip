@@ -1,3 +1,4 @@
+
 % Experiment1 Try to prove that the modified module is as same as the 
 % original alg..
 
@@ -7,7 +8,7 @@
 % 3. get the total line-graph and separate vXt chart 
 %%
 
-%%  就是用来跑光流增强算法的！
+%%  就是用来跑光流增强算法的！ --- 只用光流，然后不用插帧算法。不设定阈值
 
 
 OTBToolkitBase = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/OTBToolkit';
@@ -15,7 +16,7 @@ AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuid
 addpath(genpath(OTBToolkitBase));
 addpath(genpath(AdvBaselinePath));
 
-BEST_TH = 0.0052;
+BEST_TH = -1;
 conf = config;
 testAlg = {'VITAL'};
 targetSet = 'OTB100';
@@ -25,7 +26,7 @@ seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
-resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','MotionDiff_Opt1');
+resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','MotionDiff_OnyOptNoThresh');
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
@@ -160,7 +161,7 @@ for idxVideo=2:8:length(videosList) %% Here to do the paralell things
         saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
         %%%
         disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-        str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_4' '(imgSet,init_rect,' num2str(BEST_TH) ');'];
+        str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_5' '(imgSet,init_rect,-1);'];
         eval(str0);                       
         results = {}; 
         res = struct;
@@ -168,31 +169,14 @@ for idxVideo=2:8:length(videosList) %% Here to do the paralell things
         res.endFrame   = endFrame;
         res.len        = endFrame - startFrame + 1;
         res.type       = 'rect';
-        res.fps        =  fpsAdv;
+        res.fps        =  fpsAdv;git s
         res.anno       = rect_anno;
         res.res        = resAdv;
         res.InterpBbox = InterpBboxAdv;
-        res.th = th;
+        res.th = -1;
         res.MDE     = MDEGArr;
         results{end+1}  = res;
         save(saveAdv, 'results');
-        
-        if IF_RUN_ORI
-            disp([ 'AdvBaseline Validation check:ORI' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-            str = ['[resOri,fpsOri] = run_' t.name '(imgSet,init_rect,' num2str(BEST_TH) ');'];
-            eval(str); 
-            results = {};
-            res = struct;
-            res.startFrame = startFrame;
-            res.endFrame   = endFrame;
-            res.len        = endFrame - startFrame + 1;
-            res.type       = 'rect';
-            res.fps        =  fpsOri;
-            res.anno       = rect_anno;
-            res.res        = resOri;
-            results{end+1}  = res;
-            save(saveOri, 'results');
-        end
         cd (workingDirectory);
         rmpath(genpath(algWorkingDirectory));
     end
