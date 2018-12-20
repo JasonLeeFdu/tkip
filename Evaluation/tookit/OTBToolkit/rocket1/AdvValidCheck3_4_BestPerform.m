@@ -7,7 +7,8 @@
 % 3. get the total line-graph and separate vXt chart 
 %%
 
-%%  就是用来跑光流增强算法的！
+%%  就是用来跑光流增强算法的！,而且是从20个结果里面挑选最好的作为最终的结果
+%%  请用来测试一下差分法的性能(看一下全局、局部的结果)
 
 
 OTBToolkitBase = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/OTBToolkit';
@@ -30,7 +31,7 @@ datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
 IF_RUN_ORI = false;
-MAX_TRAIL_TIMES = 2;
+MAX_TRAIL_TIMES = 10;
 
 
 if ~strcmp(resPathBase(end),'/')
