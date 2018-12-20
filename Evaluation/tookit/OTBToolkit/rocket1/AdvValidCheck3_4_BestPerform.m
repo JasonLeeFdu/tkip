@@ -109,7 +109,7 @@ videosList = videosList(3:end);
 
 
 
-for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多进程)  
+for idxVideo=8:8:length(videosList) %% 对于每一个视频(此处可以使用多进程)  
      disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
     for trailTimes = 1:MAX_TRAIL_TIMES
         disp(['====> ' num2str(trailTimes)   ]);
