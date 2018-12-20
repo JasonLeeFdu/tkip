@@ -72,19 +72,6 @@ attrNamesEnglish = {'IV','OPR','SV','OCC','DEF','MB','FM','IPR','OV','BC','LR'};
 attPath = [BASE_PATH 'Evaluation/tookit/OTBToolkit' '/anno/att/']; % The folder that contains the annotation files for sequence attributes
 attStringSet={};
 att = [];
-% for idxSeq=1:numSeq
-%     s = seqs{idxSeq};
-%     nameSeqAll{idxSeq}=s.name;
-%     attributeFileName = [attPath lower(s.name) '.txt'];
-%     tmp = load(attributeFileName);
-%     recIdx = find(tmp);
-%     att(idxSeq,:)= tmp;
-%     recStr = '';
-%     for i = 1:length(recIdx)
-%         recStr = strcat(recStr,attrNames{recIdx(i)});
-%     end
-%     attStringSet{end+1} = recStr;
-% end
 
 numTrk=length(trackers);
 videosList = dir(datasetBase);
@@ -109,7 +96,7 @@ videosList = videosList(3:end);
 
 
 
-for idxVideo=1:length(videosList) %% 对于每一个视频(此处可以使用多进程)  
+for idxVideo=4:8:length(videosList) %% 对于每一个视频(此处可以使用多进程)  
      disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
     for trailTimes = 1:MAX_TRAIL_TIMES
         disp(['====> ' num2str(trailTimes)   ]);
