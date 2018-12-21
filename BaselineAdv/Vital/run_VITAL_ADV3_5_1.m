@@ -1,6 +1,6 @@
-function [ result ,Interp_bbox,MDEGArr,th,fps] = run_VITAL_ADV3_4(imgSet, init_rect,localTh)
+function [ result ,Interp_bbox,MDEGArr,th,fps] = run_VITAL_ADV3_5_1(imgSet, init_rect,localTh)
 
-%% 局部更新算法----光流版**   v1.0
+%% 局部更新算法----光流版,**   v1.5.1--尝试仅仅使用光流，而不使用插帧.采用有阈值的光流
 %%% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
 
 run ./matconvnet/matlab/vl_setupnn ;
@@ -109,30 +109,31 @@ startt = toc;
 
 target_score = 2.8888888;
 MDEGArr(1)= 0.0;
-th = localTh;
+th = -1;
 
 %% Main loop
 for To = 2:nFrames
     %% Whether need enhancement, judged by 'Local  Difference' M12011155
-    thisImg = imread(imgSet{To});
-    
-    [H,W,c] = size(thisImg);
-  
-    diff_T = optF(imgSet,To);
-    diff_X = diff_T(:,:,1);
-    diff_Y = diff_T(:,:,2);
-    diff   = sqrt(diff_X.^2 + diff_Y.^2);
-    %% 废除：通过统计上个框周围1.5倍范围的区域的像素平均差分变化值，来判断是否使用插帧结果
+    optFlow = optF(imgSet,To);     %此处去计算TimeO-1的光流
+    %% 通过统计上个框周围1.5倍范围的区域的像素平均差分变化值，来判断是否使用插帧结果
+    %% $$$$$ 其实如何把光流到新的框做一个小网络应该也能有不错的效果
+    diff_X = optFlow(:,:,1);
+    diff_Y = optFlow(:,:,2);
+    [H,W,C] = size(optFlow);
+    diff   = sqrt(diff_X.^2 + diff_Y.^2);    
     searchRect = targetLoc;%expandSearchArea(targetLoc,conf.MotionSearchR,H,W); %% 
-    %l = targetLoc(1);t = targetLoc(2);w = targetLoc(3);h=targetLoc(4);
     l = searchRect(1);t = searchRect(2);w = searchRect(3);h=searchRect(4);
     localDiff = diff(max(1,t):min(t+h-1,H),max(1,l):min(W,l+w-1));
     factor = sum(sum(localDiff)) / (w*h);
     MDEGArr(end+1) = factor;
-    OF = factor > localTh;
+    OptRectSWITCH = factor > localTh; % this variable is responsible for optical flow rect sample point enhancement   
+    InterpSWITCH = false; % this variable is responsible for interpolation reinforcement
+
+    newRect = optShiftRect(targetLoc,optFlow);
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% for enhancement
-    if OF 
+    %% for Interpolation enhancement
+    if InterpSWITCH 
         imgInterpLast = interpAlg(imgSet,To);%$
         if(size(imgInterpLast,3)==1), imgInterpLast = cat(3,imgInterpLast,imgInterpLast,imgInterpLast); end
         samples_Itp = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);%$
@@ -148,8 +149,8 @@ for To = 2:nFrames
         targetLoc_Itp = targetLoc; %%
     end
     
-    %% end the enhancement
-    if OF
+    %% end the enhancement  % record
+    if InterpSWITCH 
         Interp_bbox(interpCounter,:) = targetLoc_Itp;
         interpCounter = interpCounter + 1;
     else
@@ -160,7 +161,7 @@ for To = 2:nFrames
     
     
     %% Estimation 下面开始好好的跑检测的步骤
-    if OF
+    if InterpSWITCH
         if target_score_Itp > targetScores(To-1) && targetScores(To-1) > 0
             samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
             samples2 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
@@ -175,6 +176,11 @@ for To = 2:nFrames
     else
         samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
         samples = samples1;
+    end
+    
+    if OptRectSWITCH
+        samples2 = gen_samples('gaussian', newRect, opts.nSamples, opts, trans_f, scale_f);
+        samples = [samples;samples2];
     end
     
     img = imread(imgSet{To});
@@ -205,7 +211,7 @@ for To = 2:nFrames
         trans_f = opts.trans_f;
     end
 
-    % if OF
+    % if InterpSWITCH
     % bbox regression ###$$$ 这个可能是下面工作将要解决的问题
     if(opts.bbreg && target_score>0)
         X_ = permute(gather(feat_conv(:,:,:,idx(1:5))),[4,3,1,2]);
@@ -300,7 +306,6 @@ Wmax = W - l2 + 1;
 Hmax = H - t2 + 1;
 w2   = max(1,min(Wmax,w2));
 h2   = max(1,min(Hmax,h2));
-
 
 rect2 = [l2;t2;w2;h2];
 rect2 = round(rect2);
