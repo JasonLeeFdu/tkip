@@ -9,7 +9,7 @@
 
 
 %%  这一次是用来跑对比实验用到，1-3分别是只用原框、只用光流、两框都用，另外保存的路径也发生变化
-%%  就是用来跑光流增强算法的！ --- 只用原框，然后不用插帧算法。不设阈值
+%%  就是用来跑光流增强算法的！ --- 只用光流，然后不用插帧算法。 不设阈值
 
 
 OTBToolkitBase = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/OTBToolkit';
@@ -27,7 +27,7 @@ seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
-resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results/ComparativeTest','OnlyLastRect');
+resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results/ComparativeTest','OnlyFlowedRect');
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
@@ -162,7 +162,7 @@ for idxVideo=1:2:length(videosList) %% Here to do the paralell things
         saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
         %%%
         disp([ 'AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name])       
-        str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_5_1' '(imgSet,init_rect,' num2str(BEST_TH) ');'];
+        str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_5_2' '(imgSet,init_rect,' num2str(BEST_TH) ');'];
         eval(str0);                       
         results = {}; 
         res = struct;
