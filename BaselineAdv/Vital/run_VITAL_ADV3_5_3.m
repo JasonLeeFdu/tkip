@@ -2,6 +2,8 @@ function [ result ,Interp_bbox,MDEGArr,th,fps] = run_VITAL_ADV3_5_3(imgSet, init
 
 %%% 对比实验，上一帧+光流移动框，为铆钉点
 %%  
+%%% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
+
 run ./matconvnet/matlab/vl_setupnn ;
 addpath('./utils');
 addpath('./models');
@@ -116,18 +118,9 @@ for To = 2:nFrames
     optFlow = optF(imgSet,To);     %此处去计算TimeO-1的光流
     %% 通过统计上个框周围1.5倍范围的区域的像素平均差分变化值，来判断是否使用插帧结果
     %% $$$$$ 其实如何把光流到新的框做一个小网络应该也能有不错的效果
-    diff_X = optFlow(:,:,1);
-    diff_Y = optFlow(:,:,2);
-    [H,W,C] = size(optFlow);
-    diff   = sqrt(diff_X.^2 + diff_Y.^2);    
-    searchRect = targetLoc;%expandSearchArea(targetLoc,conf.MotionSearchR,H,W); %% 
-    l = searchRect(1);t = searchRect(2);w = searchRect(3);h=searchRect(4);
-    localDiff = diff(max(1,t):min(t+h-1,H),max(1,l):min(W,l+w-1));
-    factor = sum(sum(localDiff)) / (w*h);
-    MDEGArr(end+1) = factor;
-    OptRectSWITCH = true;%factor > localTh; % this variable is responsible for optical flow rect sample point enhancement   
     InterpSWITCH = false; % this variable is responsible for interpolation reinforcement
-
+    OptRectSWITCH = true; % this variable is responsible for optical flow rect sample point enhancement
+    
     newRect = optShiftRect(targetLoc,optFlow);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -179,7 +172,7 @@ for To = 2:nFrames
     
     if OptRectSWITCH
         samples2 = gen_samples('gaussian', newRect, opts.nSamples, opts, trans_f, scale_f);
-        samples = [samples;samples2]; %%%$$$ 2 time the size of the samples
+        samples = [samples;samples2];
     end
     
     img = imread(imgSet{To});

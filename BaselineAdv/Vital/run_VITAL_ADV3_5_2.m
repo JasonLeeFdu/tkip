@@ -2,6 +2,7 @@ function [ result ,Interp_bbox,MDEGArr,th,fps] = run_VITAL_ADV3_5_2(imgSet, init
 
 %%% 对比实验，此处，仅有光流移动框该帧的铆钉点
 %%  
+%%% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
 
 run ./matconvnet/matlab/vl_setupnn ;
 addpath('./utils');
@@ -9,10 +10,6 @@ addpath('./models');
 addpath('./vital');
 addpath('./tracking');
 addpath('./adv');           %%  插帧算法、求光流算法
-
-
-
-
 
 
 
@@ -121,18 +118,9 @@ for To = 2:nFrames
     optFlow = optF(imgSet,To);     %此处去计算TimeO-1的光流
     %% 通过统计上个框周围1.5倍范围的区域的像素平均差分变化值，来判断是否使用插帧结果
     %% $$$$$ 其实如何把光流到新的框做一个小网络应该也能有不错的效果
-    diff_X = optFlow(:,:,1);
-    diff_Y = optFlow(:,:,2);
-    [H,W,C] = size(optFlow);
-    diff   = sqrt(diff_X.^2 + diff_Y.^2);    
-    searchRect = targetLoc;%expandSearchArea(targetLoc,conf.MotionSearchR,H,W); %% 
-    l = searchRect(1);t = searchRect(2);w = searchRect(3);h=searchRect(4);
-    localDiff = diff(max(1,t):min(t+h-1,H),max(1,l):min(W,l+w-1));
-    factor = sum(sum(localDiff)) / (w*h);
-    MDEGArr(end+1) = factor;
-    OptRectSWITCH = true;%factor > localTh; % this variable is responsible for optical flow rect sample point enhancement   
     InterpSWITCH = false; % this variable is responsible for interpolation reinforcement
-
+    OptRectSWITCH = true; % this variable is responsible for optical flow rect sample point enhancement
+    
     newRect = optShiftRect(targetLoc,optFlow);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -163,30 +151,29 @@ for To = 2:nFrames
     end
     
     
-%     
-%     %% Estimation 下面开始好好的跑检测的步骤
-%     if InterpSWITCH
-%         if target_score_Itp > targetScores(To-1) && targetScores(To-1) > 0
-%             samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
-%             samples2 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
-%             samples = [samples1;samples2];
-%         elseif target_score_Itp > targetScores(To-1) && targetScores(To-1) < 0
-%             samples2 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
-%             samples = samples2;
-%         else
-%             samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
-%             samples = samples1;
-%         end
-%     else
-%         samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
-%         samples = samples1;
-%     end
-%     
-%     
+    
+    %% Estimation 下面开始好好的跑检测的步骤
+    if InterpSWITCH
+        if target_score_Itp > targetScores(To-1) && targetScores(To-1) > 0
+            samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
+            samples2 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
+            samples = [samples1;samples2];
+        elseif target_score_Itp > targetScores(To-1) && targetScores(To-1) < 0
+            samples2 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
+            samples = samples2;
+        else
+            samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
+            samples = samples1;
+        end
+    else
+        samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
+        samples = samples1;
+    end
+    
     if OptRectSWITCH
-        %%%$$$ 2 times the samples
-        samples2 = gen_samples('gaussian', newRect, opts.nSamples*2, opts, trans_f, scale_f);
-        samples = [samples2;samples2];  %%%$$$ Only with optfRect
+        samples1 = gen_samples('gaussian', newRect, opts.nSamples, opts, trans_f, scale_f);
+        samples2 = gen_samples('gaussian', newRect, opts.nSamples, opts, trans_f, scale_f);
+        samples = [samples1;samples2];
     end
     
     img = imread(imgSet{To});

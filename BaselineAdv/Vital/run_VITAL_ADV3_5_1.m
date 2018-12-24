@@ -1,7 +1,7 @@
 function [ result ,Interp_bbox,MDEGArr,th,fps] = run_VITAL_ADV3_5_1(imgSet, init_rect,localTh)
 
 %%%对比实验，此处，仅有上一帧的原始框作为该帧的铆钉点
-%% 
+%% DEPRECATED!!!
 run ./matconvnet/matlab/vl_setupnn ;
 addpath('./utils');
 addpath('./models');
