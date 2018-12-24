@@ -98,11 +98,11 @@ videosList = videosList(3:end);
 doneFlagVid = false;
 
 for idxVideo=2:8:length(videosList) %% 对于每一个视频(此处可以使用多进程)  
-     disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
-     completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,t.name);
+     disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
+     completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
-                  fprintf([ 'Best Result --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
-                  fprintf(' %d is DONE! \n',trailTimes); 
+                  fprintf([ 'Best Result --- '  num2str(idxVideo) '_' videosList(idxVideo).name]);
+                  fprintf(' is DONE! \n'); 
                   continue;
      end
     for trailTimes = 1:MAX_TRAIL_TIMES
