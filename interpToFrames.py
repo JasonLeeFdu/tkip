@@ -8,13 +8,13 @@ import shutil
 
 
 
-dsTypeFrom = 'OriginalInterp'                                                                                   ######set manually
+dsTypeFrom = 'OriginalInterp'                                                                                   ######set manually 
 dsRate     = 2                                                                                                  ######set manually
 dbType     = 'OTB50'                                                                                            ######set manually
 path = '/home/winston/OTB50_result/'                                                                            ######set manually
 labelDsTypeFrom = 'Original'                                                                                    ######set manually
 
-
+  
 
 
 if __name__ == "__main__":
