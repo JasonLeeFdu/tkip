@@ -103,7 +103,7 @@ for idxVideo=2:8:length(videosList) %% 对于每一个视频(此处可以使用�
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
                   fprintf([ 'Best Result --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
                   fprintf(' %d is DONE! \n',trailTimes); 
-                  continue;
+                  conti
      end
     for trailTimes = 1:MAX_TRAIL_TIMES
         disp(['====> ' num2str(trailTimes)   ]);
