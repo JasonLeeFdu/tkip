@@ -2,7 +2,7 @@ function [ result ,Interp_bbox,MDEGArr,th,fps] = run_VITAL_ADV3_4(imgSet, init_r
 
 %% 局部更新算法----光流版**   v1.0
 %%% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
-
+%%%$$$ 局部光流法
 run ./matconvnet/matlab/vl_setupnn ;
 addpath('./utils');
 addpath('./models');

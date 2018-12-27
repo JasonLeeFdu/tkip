@@ -2,7 +2,7 @@ function [ result ,Interp_bbox,MDEGArr,th,fps] = run_VITAL_ADV3_2(imgSet, init_r
 %% The first amendment for the advanced VITAL. In order to generate a better
 %% demo, we fix this function by letting it record the result bbox of the 
 %% procedure that manipulates interpolated frames  
-
+%%%$$$ 全局帧差百分比法
 %% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
 %%% THresh Test
 %%%%  THresh Test -- rate by argument

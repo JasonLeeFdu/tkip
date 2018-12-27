@@ -64,12 +64,12 @@ for idxSeq=1:length(seqs)
         if ~isfield(res,'type')&&isfield(res,'transformType')
             res.type = res.transformType;
             res.res = res.res';
-         end
+        end
             
         %%%%%%%%%%% This is very important.
         [aveCoverage, aveErrCenter, errCoverage, errCenter] = calcSeqErrRobust(res, anno);
         for tIdx=1:length(thresholdSetOverlap)
-            successNumOverlap(idx,tIdx) = sum(errCoverage >thresholdSetOverlap(tIdx));
+            successNumOverlap(idx,tIdx) = sum(errCoverage > thresholdSetOverlap(tIdx));
         end
         for tIdx=1:length(thresholdSetError)
             successNumErr(idx,tIdx) = sum(errCenter <= thresholdSetError(tIdx));

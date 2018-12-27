@@ -1,6 +1,7 @@
 function [ result ,Interp_bbox,MDEGArr,th,fps] = run_VITAL_ADV3_5_1(imgSet, init_rect,localTh)
 
 %% 局部更新算法----光流版,**   v1.5.1--尝试仅仅使用光流，而不使用插帧.采用有阈值的光流
+%%%$$$ 局部光流，有阈值地使用光流平移框+上一帧框
 %%% 融合策略 更新策略 搞清楚每一部分输入是什么输出是什么，对每一帧插帧以及不插帧，都进行判断与不同的处理运算
 
 run ./matconvnet/matlab/vl_setupnn ;
