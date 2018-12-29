@@ -15,9 +15,9 @@ additionalNameTag = strategy;
 
 %%%%%%%%%  About path  %%%%%%%%%%%%
                                      
-evalType = 'OPE';                  % only one                                  
-downSampleType = 'stateoftheart';         % Ideal Original Std StdInterp       OriginalInterp     
-dBType = 'OTB100';                  % 'OTB100' 'OTB50' 'VOT2016'
+evalType = 'OPE';                       % only one                                  
+downSampleType = 'stateoftheart';    	% Ideal Original Std StdInterp       OriginalInterp     
+dBType = 'OTB100';                      % 'OTB100' 'OTB50' 'VOT2016'
 dsRate = 2;
 
 

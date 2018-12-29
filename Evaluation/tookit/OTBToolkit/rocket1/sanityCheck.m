@@ -113,18 +113,9 @@ for idxVideo=1:length(videosList)
         resOriFileSaveName = sprintf('%s_%s_Ori.mat',videosList(idxVideo).name,t.name);      
         resAdvFileSaveName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,t.name);
         if exist(fullfile(resPathBase,resOriFileSaveName),'file') && (~overWrite)
-%                    load(resOriFileSaveName)
-%                     if annoResDimMatchCheck 
-%                            resultsOri = load(resFileSaveName) ;
-%                            resultsOri = resultsOri(1).results;
-%                     end
-%                    if any(size(resultsOri{1,1}.res)~= size(resultsOri{1,1}.anno))
-%                        resultsOri{1,1}.res = resultsOri{1,1}.res(1:2:end,:);
-%                        save(resFileSaveName, 'results');
-%                        fprintf([downSampleType ' --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
-%                        fprintf(' the results are fixed! \n');
-%                    end     
-                 fprintf([ 'Sanity check --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
+
+            
+            fprintf([ 'Sanity check --- ' num2str(idxTrk) '_' t.name ', ' num2str(idxVideo) '_' videosList(idxVideo).name]);
                  fprintf(' is DONE! \n'); 
                 continue;
         end
