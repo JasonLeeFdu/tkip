@@ -7,11 +7,7 @@
 % 3. get the total line-graph and separate vXt chart 
 %%
 
-%%  就是用来跑光流增强算法的！,而且是从10个结果里面挑选最好的作为最终的结果
-%%  请用来测试一下差分法的性能(看一下全局、局部的结果)
-%%  这一次是用来跑对比实验用到，1-3分别是只用原框、只用光流、两框都用，另外保存的路径也发生变化
-%%  就是用来跑光流增强算法的！ --- 两框都用，然后不用插帧算法。 不设阈值
-
+%%  yuansh
 
 OTBToolkitBase = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/OTBToolkit';
 AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/BaselineAdv/Vital';
@@ -256,5 +252,5 @@ for idxDownSampleType = 1:length(downSampleTypeSet)
         tmpMtrx = mean(tmpMtrx,2);     % AUC of  % #Movies * #Baseline 
         resIntetmediate{end+1} = tmpMtrx; % 
    end
-end
+end 
 fprintf('结束！');
