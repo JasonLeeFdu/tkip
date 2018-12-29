@@ -26,12 +26,12 @@ seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
-resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','MotionDiffOpt1_Best');
+MAX_TRAIL_TIMES = 10;
+resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results',strcat('MotionDiffOpt1_BestPerf',num2str(MAX_TRAIL_TIMES)));
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
 IF_RUN_ORI = false;
-MAX_TRAIL_TIMES = 10;
 
 
 if ~strcmp(resPathBase(end),'/')
@@ -58,7 +58,7 @@ end
 for i = 1:length(testAlg)
     resSubPath = fullfile(resPathBase,testAlg{i}); %%%
     if ~exist(resSubPath,'dir')
-       mkdir(resSubPath);       
+       %mkdir(resSubPath);       
     end
 end
 
