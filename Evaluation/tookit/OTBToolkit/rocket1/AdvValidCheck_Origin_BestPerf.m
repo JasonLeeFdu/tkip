@@ -13,8 +13,7 @@ OTBToolkitBase = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuide
 AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/BaselineAdv/Vital';
 addpath(genpath(OTBToolkitBase));
 addpath(genpath(AdvBaselinePath));
-
-
+GPU_ID = 1;
 conf = config;
 testAlg = {'VITAL'};
 targetSet = 'OTB100';
@@ -31,6 +30,7 @@ datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 BASE_PATH = conf.BASE_PATH;
 IF_RUN_ORI = false;
 
+parallel.gpu.GPUDeviceManager.instance.selectDevice(GPU_ID)
 
 if ~strcmp(resPathBase(end),'/')
     resPathBase = strcat(resPathBase,'/');
@@ -96,7 +96,7 @@ videosList = videosList(3:end);
 doneFlagVid = false;
 
 
-for idxVideo=  4:8:length(videosList)% 对于每一个视频(此处可以使用多进程)  
+for idxVideo=  8:8:length(videosList)% 对于每一个视频(此处可以使用多进程)  
      disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
      completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
