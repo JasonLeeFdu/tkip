@@ -7,18 +7,18 @@
 % 3. get the total line-graph and separate vXt chart 
 %%
 
-%%  就是用来跑光流增强算法的！,而且是从10个结果里面挑选最好的作为最终的结果
-%%  请用来测试一下差分法的性能(看一下全局、局部的结果)
-%%  就是用来跑光流增强算法的！ --- 光流框 + 上一帧的框 都用，然后不用插帧算法。 不设阈值。并且采用两中心点最好值筛选制。
+%%  就是用来跑光流增强算法的�?,而且是从10个结果里面挑选最好的作为�?终的结果
+%%  请用来测试一下差分法的�?�能(看一下全�?、局部的结果)
+%%  就是用来跑光流增强算法的�? --- 光流�? + 上一帧的�? 都用，然后不用插帧算法�?? 不设阈�?��?�并且采用两中心点最好�?�筛选制�?
 
 
-OTBToolkitBase = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/OTBToolkit';
-AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/BaselineAdv/Vital';
+OTBToolkitBase = 'I:/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/OTBToolkit';
+AdvBaselinePath = 'I:/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/BaselineAdv/Vital';
 addpath(genpath(OTBToolkitBase));
 addpath(genpath(AdvBaselinePath));
 
 
-conf = config;
+conf = winconfig;
 testAlg = {'VITAL'};
 targetSet = 'OTB100';
 trackers=ConfigMatTrackers;
@@ -28,24 +28,24 @@ numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
 
-MAX_TRAIL_TIMES = 10;
-resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results',strcat('BothRects_Choose2Center_BestPerf',num2str(MAX_TRAIL_TIMES)));
-datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
+MAX_TRAIL_TIMES = 5;
+resPathBase = fullfile('I:/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results',strcat('BothRects_Choose2Center_BestPerf',num2str(MAX_TRAIL_TIMES)));
+datasetBase = fullfile('I:/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
 IF_RUN_ORI = false;
 
 
-if ~strcmp(resPathBase(end),'/')
-    resPathBase = strcat(resPathBase,'/');
+if ~strcmp(resPathBase(end),'\')
+    resPathBase = strcat(resPathBase,'\');
 end
-if ~strcmp(datasetBase(end),'/')
-    datasetBase = strcat(datasetBase,'/');
+if ~strcmp(datasetBase(end),'\')
+    datasetBase = strcat(datasetBase,'\');
 end
 basePath = conf.BASE_PATH;
 workingDirectory = mfilename('fullpath');
 
-index_dir=findstr(workingDirectory,'/');
+index_dir=findstr(workingDirectory,'\');
 workingDirectory = workingDirectory(1:index_dir(end));
 
 if ~exist(resPathBase,'dir')
@@ -69,25 +69,25 @@ for i = 1:length(testAlg)
         trackers(i) = [];
     end
 end
-attrNames  = {'光照变化, ','平面外旋转, ','尺度变化, ','遮挡, ','形变, ','运动模糊, ','快速运动, ','平面内旋转, ','丢失视角, ','背景杂乱, ','低分辨率, '};
+attrNames  = {'光照变化, ','平面外旋�?, ','尺度变化, ','遮挡, ','形变, ','运动模糊, ','快�?�运�?, ','平面内旋�?, ','丢失视角, ','背景杂乱, ','低分辨率, '};
 attrNamesEnglish = {'IV','OPR','SV','OCC','DEF','MB','FM','IPR','OV','BC','LR'};
-attPath = [BASE_PATH 'Evaluation/tookit/OTBToolkit' '/anno/att/']; % The folder that contains the annotation files for sequence attributes
+attPath = [BASE_PATH 'Evaluation\tookit/OTBToolkit' '/anno/att/']; % The folder that contains the annotation files for sequence attributes
 attStringSet={};
 att = [];
 
 numTrk=length(trackers);
 videosList = dir(datasetBase);
-videosList = videosList(3:end);
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 针对每一个视频
-% 1.首先进行10次运算
+% 针对每一个视�?
+% 1.首先进行10次运�?
 % >  循环求解，注意保存新的文件名(非标准文件名，例如Bike_VITAL_Adv(1).mat)
 %
-% 2.然后找到里面效果最好的，并统计算法对于该算法的方差
-% >  便利每一个文件，计算其AUC+Median,以此作为标准筛选最大的文件
-% >> 顺便记录统计每一个视频的，每一次结果的AUC、Median，然后求出每一个视频的AUC、Median的方差、均值(MOVIE x [AUC Median] x [均值 方差])
+% 2.然后找到里面效果�?好的，并统计算法对于该算法的方差
+% >  便利每一个文件，计算其AUC+Median,以此作为标准筛�?�最大的文件
+% >> 顺便记录统计每一个视频的，每�?次结果的AUC、Median，然后求出每�?个视频的AUC、Median的方差�?�均�?(MOVIE x [AUC Median] x [均�?? 方差])
 %
-% 3.选择这个作为最终结果，进行下一个视频
+% 3.选择这个作为�?终结果，进行下一个视�?
 % >  对文件进行拷贝，生成标准文件，然后进行所有的删除
 % 
 % 
@@ -99,7 +99,7 @@ videosList = videosList(3:end);
 
 doneFlagVid = false;
 
-for idxVideo=  1:4:length(videosList)% 对于每一个视频(此处可以使用多进程)  
+for idxVideo=  1:length(videosList)% 对于每一个视�?(此处可以使用多进�?)  
      disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
      completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
@@ -257,4 +257,4 @@ for idxDownSampleType = 1:length(downSampleTypeSet)
         resIntetmediate{end+1} = tmpMtrx; % 
    end
 end
-fprintf('结束！');
+fprintf('结束�?');
