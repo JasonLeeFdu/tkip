@@ -103,7 +103,7 @@ for idxVideo=  1:8:length(videosList)% 对于每一个视频(此处可以使用�
           fprintf([ 'Best Result --- '  num2str(idxVideo) '_' videosList(idxVideo).name]);
           fprintf(' is DONE! \n'); 
           continue;
-     end
+     end 
     for trailTimes = 1:MAX_TRAIL_TIMES
         disp(['====> ' num2str(trailTimes)   ]);
              %% get the imgSet
