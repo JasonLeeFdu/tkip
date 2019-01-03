@@ -24,17 +24,20 @@ targetSet = 'OTB100';
 trackers=ConfigMatTrackers;
 seqs=ConfigSeqs100;
 seqNameBox = {};
+GPU_ID = 1;
+
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
 
-MAX_TRAIL_TIMES = 5;
+MAX_TRAIL_TIMES = 10;
 resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results',strcat('BothRects_Choose2Center_BestPerf',num2str(MAX_TRAIL_TIMES)));
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
 BASE_PATH = conf.BASE_PATH;
 IF_RUN_ORI = false;
 
+parallel.gpu.GPUDeviceManager.instance.selectDevice(GPU_ID)
 
 if ~strcmp(resPathBase(end),'/')
     resPathBase = strcat(resPathBase,'/');
@@ -99,12 +102,7 @@ videosList = videosList(3:end);
 
 doneFlagVid = false;
 
-<<<<<<< HEAD
-for idxVideo=  4:6:length(videosList)% 对于每一个视频(此处可以使用多进程)  
-
-=======
-for idxVideo=  1:length(videosList)% 对于每一个视频(此处可以使用多进程)  
->>>>>>> 86e54b2e5eb67bc507c6dcc98ede751c2c45f5ab
+for idxVideo=  5:5:length(videosList)% 对于每一个视频(此处可以使用多进程)  
      disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
      completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
