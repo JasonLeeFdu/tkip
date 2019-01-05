@@ -1,45 +1,56 @@
-function [ result ,Interp_bbox,Choice,th,fps] = run_VITAL_ADV3_6_1(imgSet, init_rect,localTh)
+function VITAL_ADV3_6_1__wrapper
 
 %%% 对比实验，上一帧+光流移动框，为铆钉点。  然后不是“整体”的前五名取平均，而是两个中心分别取前五，然后两中心二选一
 %%%$$$ 上一帧+光流移动框 无阈值 两中心取其一
 
+[handle, imagePath, region] = vot('rectangle');
+tmp = mfilename('fullpath');
+tmpPoses = strfind(tmp,'/');
+basePath = tmp(1:tmpPoses(end-1));
+
+runCommand = strcat(basePath,'matconvnet/matlab/vl_setupnn');
+run (runCommand);
+
+addpath(basePath);
+addpath(strcat(basePath,'utils'));
+addpath(strcat(basePath,'models'));
+addpath(strcat(basePath,'vital'));
+addpath(strcat(basePath,'tracking'));
+addpath(strcat(basePath,'adv'));           					%%  插帧算法、求光流算法
 
 
-run ./matconvnet/matlab/vl_setupnn ;
-addpath('./utils');
-addpath('./models');
-addpath('./vital');
-addpath('./tracking');
-addpath('./adv');           					%%  插帧算法、求光流算法
-
-
-
+nFrames = 10000;
 display = false;
 global gpu;
 gpu=true;
 conf = config;
-net=fullfile('./models/otbModel.mat');
+net=fullfile(strcat(basePath,'models/otbModel.mat'));
 
 %% Initialization
 % fprintf('Initialization...\n');   
 
-nFrames = length(imgSet);
 
-img = imread(imgSet{1});
+try
+    % Simple check for Octave environment
+    OCTAVE_VERSION;
+    rand('seed', sum(clock));
+    pkg load image;
+catch
+    RandStream.setGlobalStream(RandStream('mt19937ar', 'Seed', sum(clock)));
+end
+
+
+
+img = imread(imagePath);
 if(size(img,3)==1), img = cat(3,img,img,img); end
-targetLoc = init_rect;
-result = zeros(nFrames, 4); result(1,:) = targetLoc;
-Interp_bbox = zeros(2*nFrames-1,4);Interp_bbox(1,:) = targetLoc;
+targetLoc = region;
 interpCounter = 2; %always appears at the present position
-targetScores = zeros(nFrames,1);
-targetScores(1) = 2.0;
+
 [net_conv, net_fc, opts] = mdnet_init(img, net);
+
 [net_G, opts_net] = G_init();
 
-
 CENTER_DELTA = opts.nSamples;
-
-
 
 %% Train a bbox regressor
 if(opts.bbreg)
@@ -80,6 +91,7 @@ pos_data = feat_conv(:,:,:,pos_idx);
 neg_data = feat_conv(:,:,:,neg_idx);
 
 
+
 %% Learning CNN
 % fprintf('  training cnn...\n');
 %%%$$$ finetune with hard-minging ,训练与微调第一帧,使得NET_FC获得来自第一帧的调节
@@ -87,6 +99,7 @@ net_fc = mdnet_finetune_hnm(net_fc,pos_data,neg_data,opts,...
     'maxiter',opts.maxiter_init,'learningRate',opts.learningRate_init);
 
 net_G = G_pretrain(net_fc, net_G, pos_data, opts_net);
+
 
 
 %% Prepare training data for online update
@@ -105,23 +118,25 @@ neg_idx = (1:size(neg_examples,1)) + size(pos_examples,1);
 feat_conv = mdnet_features_convX(net_conv, img, examples, opts);
 total_pos_data{1} = feat_conv(:,:,:,pos_idx);
 total_neg_data{1} = feat_conv(:,:,:,neg_idx);
-
 success_frames = 1;
 trans_f = opts.trans_f;
 scale_f = opts.scale_f;
-
-
-tic;
-startt = toc;
-
 target_score = 2.8888888;
-Choice(1)= 0.0;
-th = -1;
 
+
+
+
+To = 2; %% paoguangliu
 %% Main loop
-for To = 2:nFrames
+while true
+    %%% 获取关于VOT的信息--Connection1 
+    [handle, image] = handle.frame(handle);
+
+    if isempty(image)
+        break;
+    end;
     %% Whether need enhancement, judged by 'Local  Difference' M12011155
-    optFlow = optF(imgSet,To);     %此处去计算TimeO-1的光流
+    optFlow = optFVOT(image);     %此处去计算TimeO-1的光流
     %% $$$$$ 其实如何把光流到新的框做一个小网络应该也能有不错的效果
     InterpSWITCH = false; % this variable is responsible for interpolation reinforcement
     OptRectSWITCH = true; % this variable is responsible for optical flow rect sample point enhancement
@@ -131,15 +146,16 @@ for To = 2:nFrames
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% for Interpolation enhancement
     if InterpSWITCH 
-        imgInterpLast = interpAlg(imgSet,To);%$
-        if(size(imgInterpLast,3)==1), imgInterpLast = cat(3,imgInterpLast,imgInterpLast,imgInterpLast); end
-        samples_Itp = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);%$
-        feat_conv_Itp = mdnet_features_convX(net_conv, imgInterpLast, samples_Itp, opts);%%
-        feat_fc_Itp = mdnet_features_fcX(net_fc, feat_conv_Itp, opts);%% 
-        feat_fc_Itp = squeeze(feat_fc_Itp)';%%
-        [scores_Itp,idx_Itp] = sort(feat_fc_Itp(:,2),'descend');  %%
-        target_score_Itp = mean(scores_Itp(1:5));%%
-        targetLoc_Itp = round(mean(samples_Itp(idx_Itp(1:5),:))); %%
+        a = 1;
+%         imgInterpLast = interpAlg(imgSet,To);%$
+%         if(size(imgInterpLast,3)==1), imgInterpLast = cat(3,imgInterpLast,imgInterpLast,imgInterpLast); end
+%         samples_Itp = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);%$
+%         feat_conv_Itp = mdnet_features_convX(net_conv, imgInterpLast, samples_Itp, opts);%%
+%         feat_fc_Itp = mdnet_features_fcX(net_fc, feat_conv_Itp, opts);%% 
+%         feat_fc_Itp = squeeze(feat_fc_Itp)';%%
+%         [scores_Itp,idx_Itp] = sort(feat_fc_Itp(:,2),'descend');  %%
+%         target_score_Itp = mean(scores_Itp(1:5));%%
+%         targetLoc_Itp = round(mean(samples_Itp(idx_Itp(1:5),:))); %%
     else
         %% Take t-1 as the silent res
         target_score_Itp = target_score;%%
@@ -180,11 +196,9 @@ for To = 2:nFrames
         samples = [samples;samples2];
     end
     
-    img = imread(imgSet{To});
+    img = imread(image);
     if(size(img,3)==1), img = cat(3,img,img,img); end 
-    
-    
-    
+   
     % draw target candidates,按照高斯的方法,在上一帧附近采样,并且利用函数mdnet_features_convX抽取他们的特征
     feat_conv = mdnet_features_convX(net_conv, img, samples, opts);
     
@@ -214,9 +228,9 @@ for To = 2:nFrames
     target_score = tarScores(idxChannelChoice);
     
     % final target without regression
-    result(To,:) = targetLoc;
-    Interp_bbox(interpCounter,:) = targetLoc;
-    targetScores(To) = target_score;
+%     result(To,:) = targetLoc;
+%     Interp_bbox(interpCounter,:) = targetLoc;
+%     targetScores(To) = target_score;
     % extend search space in case of failure 作用于前面采样步骤
     if(target_score<0)
         trans_f = min(1.5, 1.1*trans_f);
@@ -231,8 +245,9 @@ for To = 2:nFrames
         X_ = X_(:,:);
         bbox_ = samples(idxMtrx(idxChannelChoice,1:5),:);
         pred_boxes = predict_bbox_regressor(bbox_reg.model, X_, bbox_);%feature and old box to gett new one. RCNN
-        result(To,:) = round(mean(pred_boxes,1));
-        Interp_bbox(interpCounter,:) = round(mean(pred_boxes,1));
+%         result(To,:) = round(mean(pred_boxes,1));
+%         Interp_bbox(interpCounter,:) = round(mean(pred_boxes,1));
+        targetLoc = round(mean(pred_boxes,1));
     end
     
     interpCounter = interpCounter + 1;
@@ -289,17 +304,21 @@ for To = 2:nFrames
             'maxiter',opts.maxiter_update,'learningRate',opts.learningRate_update);
         end
     end
-    
-    fprintf('.');
-    if mod(To,30) == 0
-        fprintf('%d\n',To);
-    end
-
+   
+    % **********************************
+    % VOT: Report position for frame
+    % **********************************
+    %targetLoc = [110.0 110.0 110.0 110.0];
+    targetLoc = double(targetLoc);
+    %dlmwrite('~/Desktop/aa/fd',targetLoc,'-append','roffset',1);
+    handle = handle.report(handle, targetLoc, target_score);
+    To = To + 1;
 end
 
-endd = toc;
-duration = endd-startt;
-fps = (nFrames) / duration;
+% **********************************
+% VOT: Output the results
+% **********************************
+handle.quit(handle);
 
 end
 

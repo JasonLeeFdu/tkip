@@ -3,20 +3,20 @@ function conf = config
 %   Detailed explanation goes here
 conf = struct;
 z = mfilename('fullpath') ;
-index_dir=findstr(z,'\');
+index_dir=findstr(z,'/');
 str_temp = z(1:index_dir(end-3));
 
 
 
 %%% configuration of the paths
 conf.BASE_PATH = str_temp;
-OTBToolkitPath = 'I:/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/mat/OTBToolkit/';
-OTB50Ideal2Path = 'I:/winston/Datasets/Tracking/Ideal2/OTB50/';
-OTB50OriginalPath = 'I:/winston/Datasets/Tracking/Original/OTB50/';
-OTB50Std2Path     = 'I:/winston/Datasets/Tracking/Std2/OTB50/';
-OTB50StdInterp2Path = 'I:/winston/Datasets/Tracking/StdInterp2/OTB50/';
-OTB50OriginalInterp2Path = 'I:e/winston/Datasets/Tracking/OriginalInterp2/OTB50/';
-OTB100OriginalPath = 'I:/winston/Datasets/Tracking/Original/OTB100/';
+OTBToolkitPath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/mat/OTBToolkit/';
+OTB50Ideal2Path = '/home/winston/Datasets/Tracking/Ideal2/OTB50/';
+OTB50OriginalPath = '/home/winston/Datasets/Tracking/Original/OTB50/';
+OTB50Std2Path     = '/home/winston/Datasets/Tracking/Std2/OTB50/';
+OTB50StdInterp2Path = '/home/winston/Datasets/Tracking/StdInterp2/OTB50/';
+OTB50OriginalInterp2Path = '/home/winston/Datasets/Tracking/OriginalInterp2/OTB50/';
+OTB100OriginalPath = '/home/winston/Datasets/Tracking/Original/OTB100/';
 
 
 conf.DatasetPath = containers.Map();
