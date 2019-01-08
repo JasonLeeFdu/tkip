@@ -31,6 +31,10 @@ metricTypeSet = {'error', 'overlap'};
 overWrite = false;
 
 MAX_TRAIL_TIMES = 10;
+<<<<<<< HEAD
+=======
+
+>>>>>>> e192c41acc81e5e79c1069f0bafd20c9572f8870
 resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results',strcat('BothRects_Choose2Center_BestPerf',num2str(MAX_TRAIL_TIMES)));
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
@@ -100,7 +104,11 @@ videosList = videosList(3:end);
 doneFlagVid = false;
 
 
+<<<<<<< HEAD
 for idxVideo=  5:5:length(videosList)% 对于每一个视频(此处可以使用多进程)  
+=======
+for idxVideo= 1:5:length(videosList)% 对于每一个视频(此处可以使用多进程)  
+>>>>>>> e192c41acc81e5e79c1069f0bafd20c9572f8870
      disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
      completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
