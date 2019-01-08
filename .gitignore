@@ -3,7 +3,7 @@
 /baselines
 /Datasets
 /Evaluation/tookit/辅助
-/Evaluation/tookit/VOT_Toolkit
+
 /Evaluation/tookit/OTBToolkit/anno
 /Evaluation/tookit/OTBToolkit/figs
 /Evaluation/tookit/OTBToolkit/initOmit
@@ -20,6 +20,37 @@
 /BaselineAdv/Vital/dataset
 /BaselineAdv/Vital/matconvnet
 /BaselineAdv/Vital/models
+
+
+/Evaluation/tookit/VOT_Toolkit/analysis
+/Evaluation/tookit/VOT_Toolkit/experiment
+/Evaluation/tookit/VOT_Toolkit/native
+/Evaluation/tookit/VOT_Toolkit/report
+/Evaluation/tookit/VOT_Toolkit/sequence
+/Evaluation/tookit/VOT_Toolkit/stacks
+/Evaluation/tookit/VOT_Toolkit/tracker
+/Evaluation/tookit/VOT_Toolkit/utilities
+/Evaluation/tookit/VOT_Toolkit/workspace
+/Evaluation/tookit/VOT_Toolkit/workspace(Ori)
+/Evaluation/tookit/VOT_Toolkit/Dockerfile
+/Evaluation/tookit/VOT_Toolkit/index.md
+/Evaluation/tookit/VOT_Toolkit/LICENSE.txt
+/Evaluation/tookit/VOT_Toolkit/README.md
+/Evaluation/tookit/VOT_Toolkit/toolkit_path.m
+/Evaluation/tookit/VOT_Toolkit/toolkit_version.m
+/Evaluation/tookit/VOT_Toolkit/VERSION
+
+/Evaluation/tookit/VOT_Toolkit/workspaceVITAL/cache
+/Evaluation/tookit/VOT_Toolkit/workspaceVITAL/logs
+/Evaluation/tookit/VOT_Toolkit/workspaceVITAL/results
+/Evaluation/tookit/VOT_Toolkit/workspaceVITAL/templates
+
+
+
+
+
+
+
 
 
 

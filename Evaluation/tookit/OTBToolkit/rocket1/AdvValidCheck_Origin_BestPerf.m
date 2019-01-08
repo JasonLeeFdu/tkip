@@ -23,7 +23,7 @@ seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
-MAX_TRAIL_TIMES = 3;
+MAX_TRAIL_TIMES = 10;
 resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results',strcat('OriginalAlg_BestPerf',num2str(MAX_TRAIL_TIMES)));
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
