@@ -1,39 +1,30 @@
-% Experiment1 Try to prove that the modified module is as same as the 
-% original alg..
+%% VITAL 算法在Temple Color 128　上进行测试，测试代码的版本不需要进行多版本的backup
+%% 这是一个多次执行取最大值的版本
 
-%%
-% 1. read the database
-% 2. get the result seperately
-% 3. get the total line-graph and separate vXt chart 
-%%
-
-%%  就是用来跑光流增强算法的！,而且是从10个结果里面挑选最好的作为最终的结果
-%%  请用来测试一下差分法的性能(看一下全局、局部的结果)
-%%  就是用来跑光流增强算法的！ --- 光流框 + 上一帧的框 都用，然后不用插帧算法。 不设阈值。并且采用两中心点最好值筛选制。
-
-
-OTBToolkitBase = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/OTBToolkit';
+path = mfilename('fullpath');
+tmp = findstr(path,'/');
+addpath(genpath(path(1:tmp(end))));
+conf = config;
+TC128Base = conf.BASE_PATH;
 AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/BaselineAdv/Vital';
-addpath(genpath(OTBToolkitBase));
 addpath(genpath(AdvBaselinePath));
 
 
-conf = config;
+
 testAlg = {'VITAL'};
-targetSet = 'OTB100';
+targetSet = 'TempleColor128';
 trackers=ConfigMatTrackers;
-seqs=ConfigSeqs100;
 seqNameBox = {};
 GPU_ID = 1;
 
-numSeq=length(seqs);
+
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
 
-MAX_TRAIL_TIMES = 10;
-resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results',strcat('BothRects_Choose2Center_BestPerf',num2str(MAX_TRAIL_TIMES)));
-datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
+MAX_TRAIL_TIMES = 2;
 
+resPathBase = fullfile(conf.BASE_PATH,'TheResults',strcat('BothRects_Choose2Center_BestPerf',num2str(MAX_TRAIL_TIMES)));
+datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 BASE_PATH = conf.BASE_PATH;
 IF_RUN_ORI = false;
 
@@ -55,9 +46,6 @@ if ~exist(resPathBase,'dir')
     mkdir(resPathBase);
 end
 
-for i = 1:length(seqs)
-    seqNameBox {end+1} = seqs{i}.name;
-end
 
 
 for i = 1:length(testAlg)
@@ -81,6 +69,7 @@ att = [];
 numTrk=length(trackers);
 videosList = dir(datasetBase);
 videosList = videosList(3:end);
+numSeq = length(videosList);
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 针对每一个视频
 % 1.首先进行10次运算
@@ -100,8 +89,9 @@ videosList = videosList(3:end);
 doneFlagVid = false;
 
 
-for idxVideo= 1:5:length(videosList)% 对于每一个视频(此处可以使用多进程)  
-     disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
+
+for idxVideo= 1:length(videosList)% 对于每一个视频(此处可以使用多进程)  
+     disp([ '================== Run VITAL in Temple Color 128 set: vital_adv' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
      completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
           fprintf([ 'Best Result --- '  num2str(idxVideo) '_' videosList(idxVideo).name]);
@@ -109,6 +99,7 @@ for idxVideo= 1:5:length(videosList)% 对于每一个视频(此处可以使用�
           continue;
      end
     for trailTimes = 1:MAX_TRAIL_TIMES
+        fprintf('\n');
         disp(['====> ' num2str(trailTimes)   ]);
              %% get the imgSet
         videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
@@ -118,7 +109,7 @@ for idxVideo= 1:5:length(videosList)% 对于每一个视频(此处可以使用�
            imgSet{end+1} = fullfile(videoClip,imagesInfo(i).name) ;
         end    
         %% get the anno
-        annoPath   = fullfile(datasetBase,videosList(idxVideo).name,'groundtruth_rect.txt');
+        annoPath   = fullfile(datasetBase,videosList(idxVideo).name,[videosList(idxVideo).name '_gt.txt']);
         rect_anno  = dlmread(annoPath);
         init_rect  = rect_anno(1,:); 
 
@@ -187,10 +178,10 @@ for idxVideo= 1:5:length(videosList)% 对于每一个视频(此处可以使用�
             res.type       = 'rect';
             res.fps        =  fpsAdv;
             res.anno       = rect_anno;
-            res.res        = resAdv;
+            res.res        = double(resAdv);
             res.InterpBbox = InterpBboxAdv;
-            res.th = th;
-            res.MDE     = MDEGArr;
+            res.th         = th;
+            res.MDE        = MDEGArr;
             results{end+1}  = res;
             save(saveAdv, 'results');
             cd (workingDirectory);
@@ -215,6 +206,7 @@ for idxVideo= 1:5:length(videosList)% 对于每一个视频(此处可以使用�
     [argvalue, argmax] = max(Metyrc);
     
     stdResFn = fullfile( resPathBase , sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,t.name));
+    stdTc128ResFn = fullfile( resPathBase , sprintf('%s_%sAdv.txt',videosList(idxVideo).name,t.name));
     bestResFn = fullfile( resPathBase , sprintf('%s_%s_Adv(%d).mat',videosList(idxVideo).name,t.name,argmax));
     copyfile(bestResFn, stdResFn);
     % remove the (kk) files
@@ -226,36 +218,10 @@ for idxVideo= 1:5:length(videosList)% 对于每一个视频(此处可以使用�
     results{1,1}.IOUArr = IOUArr;    
     results{1,1}.PrecArr = PrecArr;
     save(stdResFn,'results');
+    %% write the txt restuls
+    dlmwrite(stdTc128ResFn,double(results{1,1}.res));
     disp('----------------------------------------------------');
 
 end
-downSampleTypeSet = {'Ori','Adv'};
-GenPerfMat3(seqs, trackers, 'OPE', resPathBase, resPathBase,downSampleTypeSet{1});
-GenPerfMat3(seqs, trackers, 'OPE', resPathBase, resPathBase,downSampleTypeSet{2});
-deltaMetric = zeros(numSeq,numTrk);
-resIntetmediate = {};
 
-attStringSet = attStringSet';
-
-for idxDownSampleType = 1:length(downSampleTypeSet)
-    additionalNameTag = downSampleTypeSet{idxDownSampleType};
-    for idxMetricType = 1:length(metricTypeSet)
-        metricType = metricTypeSet{idxMetricType};
-        plotType = [metricType '_OPE'];
-        perfMatPath = resPathBase;
-        if ~ strcmp(additionalNameTag,'')
-            dataName = [perfMatPath 'aveSuccessRatePlot_' num2str(numTrk) 'alg_'  plotType '_' additionalNameTag '.mat'];
-        else
-            dataName = [perfMatPath 'aveSuccessRatePlot_' num2str(numTrk) 'alg_'  plotType '.mat'];
-        end
-     
-        
-        load(dataName); % get the aveSuccessRatePlot OF: 
-        tmpMtrx = aveSuccessRatePlot; %  #Baseline * #Movies * #threshold
-        [~,s1,s2] = size(tmpMtrx);
-        tmpMtrx = reshape(tmpMtrx,[s1,s2]);
-        tmpMtrx = mean(tmpMtrx,2);     % AUC of  % #Movies * #Baseline 
-        resIntetmediate{end+1} = tmpMtrx; % 
-   end
-end
 fprintf('结束！');

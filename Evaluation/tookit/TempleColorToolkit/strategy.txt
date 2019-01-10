@@ -1,0 +1,8 @@
+strategy:
+1. Test weirdo:
+   'Busstation_ce2'	'David'	'Football1'	'Hurdle_ce2'	'Jogging1'	'Jogging2'	'Subway'
+2. Test wrong gt:
+   None
+3. Load the toolkit.
+
+

@@ -1,20 +1,10 @@
-% Experiment1 Try to prove that the modified module is as same as the 
-% original alg..
-
-%%
-% 1. read the database
-% 2. get the result seperately
-% 3. get the total line-graph and separate vXt chart 
-%%
-
-%%  就是用来跑光流增强算法的！,而且是从10个结果里面挑选最好的作为最终的结果
-%%  请用来测试一下差分法的性能(看一下全局、局部的结果)
-%%  就是用来跑光流增强算法的！ --- 光流框 + 上一帧的框 都用，然后不用插帧算法。 不设阈值。并且采用两中心点最好值筛选制。
+%% VITAL 算法在Temple Color 128　上进行测试，测试代码的版本不需要进行多版本的backup
+%% 
 
 
-OTBToolkitBase = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/OTBToolkit';
+TC128Base = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/tookit/TempleColorToolkit';
 AdvBaselinePath = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/BaselineAdv/Vital';
-addpath(genpath(OTBToolkitBase));
+addpath(genpath(TC128Base));
 addpath(genpath(AdvBaselinePath));
 
 
