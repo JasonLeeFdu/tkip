@@ -64,6 +64,7 @@ if strcmp(type,'frm')
         
     end
 elseif strcmp(type,'itp') 
+    resIdx = To;
     if length(strfind(imgSet{To},'OTB')) > 0
         n = 4;
         format = ['%0' num2str(n) 'd'  ];

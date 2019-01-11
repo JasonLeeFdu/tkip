@@ -121,9 +121,9 @@ th = -1;
 %% Main loop
 for To = 2:nFrames
     %% Whether need enhancement, judged by 'Local  Difference' M12011155
-    optFlow = optF(imgSet,To);     %此处去计算TimeO-1的光�?
+    optFlow = optF(imgSet,To,'frm');     %此处去计算TimeO-1的光�?
     %% $$$$$ 其实如何把光流到新的框做�?个小网络应该也能有不错的效果
-    InterpSWITCH = fals; % this variable is responsible for interpolation reinforcement
+    InterpSWITCH = false; % this variable is responsible for interpolation reinforcement
     OptRectSWITCH = true; % this variable is responsible for optical flow rect sample point enhancement
     
     
