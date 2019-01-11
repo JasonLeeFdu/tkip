@@ -136,7 +136,8 @@ while true
         break;
     end;
     %% Whether need enhancement, judged by 'Local  Difference' M12011155
-    optFlow = optFVOT(image);     %此处去计算TimeO-1的光流
+    optFlow = optF(image,To,'frm');     %此处去计算TimeO-1的光流
+    %optFlow = optFVOT(image);     %此处去计算TimeO-1的光流
     %% $$$$$ 其实如何把光流到新的框做一个小网络应该也能有不错的效果
     InterpSWITCH = false; % this variable is responsible for interpolation reinforcement
     OptRectSWITCH = true; % this variable is responsible for optical flow rect sample point enhancement

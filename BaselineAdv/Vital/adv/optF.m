@@ -15,10 +15,12 @@ resIdx = To -1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                     CONFIGURATION
-OTB100_FRM_OPT_PATH = '';
-OTB100_ITP_OPT_PATH = '';
-VOT2016_FRM_OPT_PATH = '';
-VOT2016_FRM_OPT_PATH = '';
+OTB100_FRM_OPT_PATH = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Datasets/Original/OTB100_optFlow/';
+OTB100_ITP_OPT_PATH = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Datasets/OriginalInterp2/OTB100_optflow_itpNori/';
+VOT2016_FRM_OPT_PATH = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Datasets/Original/vot2016_optFlow/';
+VOT2016_ITP_OPT_PATH = '';
+TempleColor128_FRM_OPT_PATH = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Datasets/Original/TempleColor128_optFlow/';
+TempleColor128_ITP_OPT_PATH = '';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,53 +28,71 @@ VOT2016_FRM_OPT_PATH = '';
 
 Res = imgSet(To);
 token = imgSet{1};
-tail = strfind(token,'/');
+tail = strfind(token, '/');
 tail = tail(end);
 path = token(1:tail-1);
 file = token(tail+1:end);
 dot  = strfind(file,'.');
 fn   = file(1:dot-1);
 ext  = 'mat';
-n    = length(fn);
-
-flowToken = '%s_optFlow'; %'OTB100_optFlow';
 
 if strcmp(type,'frm')
     if length(strfind(imgSet{To},'OTB')) > 0
+        n = 4;
         format = ['%0' num2str(n) 'd'  ];
         targetFile = sprintf([format '_5.' ext],resIdx);
-        targetPath  = [path(1:41) 'OTB100_optFlow' path(48:end-3)];
-    elseif length(strfind(imgSet{To},'128')) > 0
+        targetPath  = OTB100_FRM_OPT_PATH;
+        tmp = imgSet{To};
+        poses = strfind(tmp,'/');
+        videoName = tmp(poses(end-2)+1:poses(end-1)-1);
+    elseif length(strfind(imgSet{To},'olor128')) > 0
+        n = 4;
         format = ['%0' num2str(n) 'd'  ];
         targetFile = sprintf([format '_5.' ext],resIdx);
-        targetPath  = [path(1:55) '_optFlow' path(56:end-3)];
-        
+        targetPath  = TempleColor128_FRM_OPT_PATH;
+        tmp = imgSet{To};
+        poses = strfind(tmp,'/');
+        videoName = tmp(poses(end-2)+1:poses(end-1)-1);
     elseif length(strfind(lower(imgSet{To}),'vot')) > 0
+        n = 8;
+        format = ['%0' num2str(n) 'd'  ];
+        targetFile = sprintf([format '_5.' ext],resIdx);
+        targetPath  = VOT2016_FRM_OPT_PATH;
+        tmp = imgSet{To};
+        poses = strfind(tmp,'/');
+        videoName = tmp(poses(end-2)+1:poses(end-1)-1);
         
     end
 elseif strcmp(type,'itp') 
     if length(strfind(imgSet{To},'OTB')) > 0
+        n = 4;
         format = ['%0' num2str(n) 'd'  ];
-        targetFile = sprintf([format '_5.' ext],resIdx);
-        targetPath  = [path(1:41) 'OTB100_optFlow' path(48:end-3)];
-    elseif length(strfind(imgSet{To},'128')) > 0
+        targetFile = sprintf([format '__5.' ext],resIdx);
+        targetPath  = OTB100_ITP_OPT_PATH;
+        tmp = imgSet{To};
+        poses = strfind(tmp,'/');
+        videoName = tmp(poses(end-2)+1:poses(end-1)-1);
+    elseif length(strfind(imgSet{To},'olor128')) > 0
+        n = 4;
         format = ['%0' num2str(n) 'd'  ];
-        targetFile = sprintf([format '_5.' ext],resIdx);
-    aq    targetPath  = [path(1:55) '_optFlow' path(56:end-3)];
-    
+        targetFile = sprintf([format '__5.' ext],resIdx);
+        targetPath  = TempleColor128_ITP_OPT_PATH;
+        tmp = imgSet{To};
+        poses = strfind(tmp,'/');
+        videoName = tmp(poses(end-2)+1:poses(end-1)-1);
     elseif length(strfind(lower(imgSet{To}),'vot')) > 0
-        z= 1;
+        n = 8;
+        format = ['%0' num2str(n) 'd'  ];
+        targetFile = sprintf([format '__5.' ext],resIdx);
+        targetPath  = VOT2016_ITP_OPT_PATH;
+        tmp = imgSet{To};
+        poses = strfind(tmp,'/');
+        videoName = tmp(poses(end-2)+1:poses(end-1)-1);
     end
-    
 end
 
 
-%% debug
-str = fullfile(targetPath,targetFile);
-fprintf('Debug: %s \n',str);
-
-
-% load(fullfile(targetPath,targetFile));
-% res = optFlow;
+load(fullfile(targetPath,videoName,targetFile));
+res = optFlow;
 end
 

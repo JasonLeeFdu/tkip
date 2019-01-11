@@ -123,62 +123,47 @@ for To = 2:nFrames
     %% Whether need enhancement, judged by 'Local  Difference' M12011155
     optFlow = optF(imgSet,To);     %此处去计算TimeO-1的光�?
     %% $$$$$ 其实如何把光流到新的框做�?个小网络应该也能有不错的效果
-    InterpSWITCH = false; % this variable is responsible for interpolation reinforcement
+    InterpSWITCH = fals; % this variable is responsible for interpolation reinforcement
     OptRectSWITCH = true; % this variable is responsible for optical flow rect sample point enhancement
     
-    newRect = optShiftRect(targetLoc,optFlow);
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% for Interpolation enhancement
-    if InterpSWITCH 
-        imgInterpLast = interpAlg(imgSet,To);%$
-        if(size(imgInterpLast,3)==1), imgInterpLast = cat(3,imgInterpLast,imgInterpLast,imgInterpLast); end
-        samples_Itp = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);%$
-        feat_conv_Itp = mdnet_features_convX(net_conv, imgInterpLast, samples_Itp, opts);%%
-        feat_fc_Itp = mdnet_features_fcX(net_fc, feat_conv_Itp, opts);%% 
-        feat_fc_Itp = squeeze(feat_fc_Itp)';%%
-        [scores_Itp,idx_Itp] = sort(feat_fc_Itp(:,2),'descend');  %%
-        target_score_Itp = mean(scores_Itp(1:5));%%
-        targetLoc_Itp = round(mean(samples_Itp(idx_Itp(1:5),:))); %%
-    else
-        %% Take t-1 as the silent res
-        target_score_Itp = target_score;%%
-        targetLoc_Itp = targetLoc; %%
-    end
+    %% %$$$ CENTER 1  targetLoc  
     
-    %% end the enhancement  % record
-    if InterpSWITCH 
-        Interp_bbox(interpCounter,:) = targetLoc_Itp;
-        interpCounter = interpCounter + 1;
-    else
-        Interp_bbox(interpCounter,:) = targetLoc;
-        interpCounter = interpCounter + 1;
-    end
+    %% %$$$ CENTER 2  newRect
+    newRect = optShiftRect(targetLoc,optFlow);    
+    
+    %% %$$$ CENTER 3  targetLoc_Itp
+    imgInterpLast = interpAlg(imgSet,To);%$
+    if(size(imgInterpLast,3)==1), imgInterpLast = cat(3,imgInterpLast,imgInterpLast,imgInterpLast); end
+    samples_Itp = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);%$
+    feat_conv_Itp = mdnet_features_convX(net_conv, imgInterpLast, samples_Itp, opts);%%
+    feat_fc_Itp = mdnet_features_fcX(net_fc, feat_conv_Itp, opts);%% 
+    feat_fc_Itp = squeeze(feat_fc_Itp)';%%
+    [scores_Itp,idx_Itp] = sort(feat_fc_Itp(:,2),'descend');  %%
+%   target_score_Itp = mean(scores_Itp(1:5));%%
+%   targetLoc_Itp = round(mean(samples_Itp(idx_Itp(1:5),:))); %%
+    X_ = permute(gather(feat_conv_Itp(:,:,:,idx_Itp(1:5))),[4,3,1,2]);
+    X_ = X_(:,:);
+    bbox_Itp = samples_Itp(idx_Itp(1:5),:);
+    pred_boxes = predict_bbox_regressor(bbox_reg.model, X_, bbox_Itp);%feature and old box to gett new one. RCNN
+    targetLoc_Itp = round(mean(pred_boxes,1));
+    target_score_Itp = mean(scores_Itp(1:5));
+    
+    %% %$$$ CENTER 4  targetLoc_Itp_Opt
+    optItpFlow = optF(imgSet,To,'itp');
+    targetLoc_Itp_Opt = optShiftRect(targetLoc_Itp,optItpFlow);
+    
+
     
     
     
-    %% Estimation 下面�?始好好的跑检测的步骤
-    if InterpSWITCH
-        if target_score_Itp > targetScores(To-1) && targetScores(To-1) > 0
-            samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
-            samples2 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
-            samples = [samples1;samples2];
-        elseif target_score_Itp > targetScores(To-1) && targetScores(To-1) < 0
-            samples2 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
-            samples = samples2;
-        else
-            samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
-            samples = samples1;
-        end
-    else
-        samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
-        samples = samples1;
-    end
-    
-    if OptRectSWITCH
-        samples2 = gen_samples('gaussian', newRect, opts.nSamples, opts, trans_f, scale_f);
-        samples = [samples;samples2];
-    end
+    %% Estimation 下面�  ?始好好的跑检测的步骤
+  
+	samples1 = gen_samples('gaussian', targetLoc, opts.nSamples, opts, trans_f, scale_f);
+    samples2 = gen_samples('gaussian', newRect, opts.nSamples, opts, trans_f, scale_f);
+    samples3 = gen_samples('gaussian', targetLoc_Itp, opts.nSamples, opts, trans_f, scale_f);
+    samples4 = gen_samples('gaussian', targetLoc_Itp_Opt, opts.nSamples, opts, trans_f, scale_f);
+    samples = [samples1;samples2;samples3;samples4];
     
     img = imread(imgSet{To});
     if(size(img,3)==1), img = cat(3,img,img,img); end 
@@ -223,7 +208,6 @@ for To = 2:nFrames
     else
         trans_f = opts.trans_f;
     end
-
     % if InterpSWITCH
     % bbox regression ###$$$ 这个可能是下面工作将要解决的问题
     if(opts.bbreg && target_score>0)
@@ -234,10 +218,8 @@ for To = 2:nFrames
         result(To,:) = round(mean(pred_boxes,1));
         Interp_bbox(interpCounter,:) = round(mean(pred_boxes,1));
     end
-    
     interpCounter = interpCounter + 1;
     %end
-   
     %% Prepare training data  本图的追踪结果基�?上记�?
     if(target_score>0)
         pos_examples = gen_samples('gaussian', targetLoc, opts.nPos_update*2, opts, 0.1, 5);
@@ -289,7 +271,6 @@ for To = 2:nFrames
             'maxiter',opts.maxiter_update,'learningRate',opts.learningRate_update);
         end
     end
-    
     fprintf('.');
     if mod(To,30) == 0
         fprintf('%d\n',To);
