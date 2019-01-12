@@ -140,14 +140,9 @@ for To = 2:nFrames
     feat_fc_Itp = mdnet_features_fcX(net_fc, feat_conv_Itp, opts);%% 
     feat_fc_Itp = squeeze(feat_fc_Itp)';%%
     [scores_Itp,idx_Itp] = sort(feat_fc_Itp(:,2),'descend');  %%
-%   target_score_Itp = mean(scores_Itp(1:5));%%
-%   targetLoc_Itp = round(mean(samples_Itp(idx_Itp(1:5),:))); %%
-    X_ = permute(gather(feat_conv_Itp(:,:,:,idx_Itp(1:5))),[4,3,1,2]);
-    X_ = X_(:,:);
-    bbox_Itp = samples_Itp(idx_Itp(1:5),:);
-    pred_boxes = predict_bbox_regressor(bbox_reg.model, X_, bbox_Itp);%feature and old box to gett new one. RCNN
-    targetLoc_Itp = round(mean(pred_boxes,1));
-    target_score_Itp = mean(scores_Itp(1:5));
+    target_score_Itp = mean(scores_Itp(1:5));%%
+    targetLoc_Itp = round(mean(samples_Itp(idx_Itp(1:5),:))); %%
+   
     
     %% %$$$ CENTER 4  targetLoc_Itp_Opt
     optItpFlow = optF(imgSet,To,'itp');
