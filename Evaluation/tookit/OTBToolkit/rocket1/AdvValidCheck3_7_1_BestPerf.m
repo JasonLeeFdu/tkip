@@ -30,7 +30,7 @@ numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
 
-MAX_TRAIL_TIMES = 5;
+MAX_TRAIL_TIMES = 2;
 resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results',strcat('FourCentersItpOpt_BestPerf',num2str(MAX_TRAIL_TIMES)));
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 

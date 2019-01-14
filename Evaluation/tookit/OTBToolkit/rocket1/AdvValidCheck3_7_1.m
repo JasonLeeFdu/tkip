@@ -26,7 +26,7 @@ seqs=ConfigSeqs100;
 seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
-overWrite = true;
+overWrite = false;
 resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','FourCentersItpOpt');
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
@@ -93,7 +93,7 @@ videosList = videosList(3:end);
 
 
 
-for idxVideo=7:7:length(videosList) %% Here to do the paralell things
+for idxVideo=1:length(videosList) %% Here to do the paralell things
     %% get the imgSet
     videoClip = fullfile(datasetBase,videosList(idxVideo).name,'img') ;   
     imgSet = {};
