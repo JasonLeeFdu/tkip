@@ -30,7 +30,7 @@ numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
 
-MAX_TRAIL_TIMES = 5;
+MAX_TRAIL_TIMES = 3;
 resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results',strcat('FourCentersItpOpt_BestPerf',num2str(MAX_TRAIL_TIMES)));
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 
@@ -101,7 +101,7 @@ doneFlagVid = false;
 
 
 
-for idxVideo= 40:8:length(videosList)% 对于每一个视频(此处可以使用多进程)  
+for idxVideo= 2:2:length(videosList)% 对于每一个视频(此处可以使用多进程)  
      disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
      completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
@@ -255,7 +255,7 @@ for idxDownSampleType = 1:length(downSampleTypeSet)
         tmpMtrx = aveSuccessRatePlot; %  #Baseline * #Movies * #threshold
         [~,s1,s2] = size(tmpMtrx);
         tmpMtrx = reshape(tmpMtrx,[s1,s2]);
-        tmpMtrx = mean(tmpMtrx,2);     % AUC of  % #Movies * #Baseline 
+        tmpMtrx                             = mean(tmpMtrx,2);     % AUC of  % #Movies * #Baseline 
         resIntetmediate{end+1} = tmpMtrx; % 
    end
 end
