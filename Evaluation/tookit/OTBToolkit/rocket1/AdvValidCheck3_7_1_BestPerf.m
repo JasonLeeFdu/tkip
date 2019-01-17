@@ -101,11 +101,7 @@ doneFlagVid = false;
 
 
 
-<<<<<<< HEAD
-for idxVideo= 2:2:length(videosList)% 对于每一个视频(此处可以使用多进程)  
-=======
-for idxVideo=[90,97]% 对于每一个视频(此处可以使用多进程)  
->>>>>>> d0b1df586a18e67720072c0c332956eb4a4a7d0d
+for idxVideo= 94:-7:1%length(videosList)% 对于每一个视频(此处可以使用多进程)  
      disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
      completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
