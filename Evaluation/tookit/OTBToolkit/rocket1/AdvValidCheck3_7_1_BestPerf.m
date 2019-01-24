@@ -19,7 +19,7 @@ addpath(genpath(AdvBaselinePath));
 
 
 conf = config;
-testAlg = {'VI5TAL'};
+testAlg = {'VITAL'};
 targetSet = 'OTB100';
 trackers=ConfigMatTrackers;
 seqs=ConfigSeqs100;

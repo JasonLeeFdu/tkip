@@ -28,7 +28,7 @@ end
 
 
 
-ext  ='jpg';
+ext  = 'jpg';
 
 OTB100_FRM_OPT_PATH = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Datasets/OriginalInterp2/OTB100/';
 TempleColor128_FRM_OPT_PATH = '/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Datasets/OriginalInterp2/TempleColor128/';
