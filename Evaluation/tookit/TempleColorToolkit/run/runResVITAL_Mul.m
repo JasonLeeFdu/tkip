@@ -13,7 +13,7 @@ addpath(genpath(AdvBaselinePath));
 
 testAlg = {'VITAL'};
 targetSet = 'TempleColor128';
-trackers=ConfigMatTrackers;
+trackers = ConfigMatTrackers;
 seqNameBox = {};
 GPU_ID = 1;
 
@@ -21,7 +21,7 @@ GPU_ID = 1;
 metricTypeSet = {'error', 'overlap'};
 overWrite = false;
 
-MAX_TRAIL_TIMES = 2;
+MAX_TRAIL_TIMES = 3;
 
 resPathBase = fullfile(conf.BASE_PATH,'TheResults',strcat('BothRects_Choose2Center_BestPerf',num2str(MAX_TRAIL_TIMES)));
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
@@ -88,9 +88,7 @@ numSeq = length(videosList);
 
 doneFlagVid = false;
 
-
-
-for idxVideo= 1:length(videosList)% 对于每一个视频(此处可以使用多进程)  
+for idxVideo= 2:3:length(videosList)% 对于每一个视频(此处可以使用多进程)  
      disp([ '================== Run VITAL in Temple Color 128 set: vital_adv' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
      completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
      if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
@@ -168,7 +166,7 @@ for idxVideo= 1:length(videosList)% 对于每一个视频(此处可以使用多�
             %%%
             saveAdv =  fullfile(resPathBaseTrk,resAdvFileSaveName);
             %%%
-            str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_6_1' '(imgSet,init_rect,' num2str(-1) ');'];
+            str0 = ['[resAdv ,InterpBboxAdv,MDEGArr,th,fpsAdv] = run_' t.name '_' 'ADV3_7_1' '(imgSet,init_rect,' num2str(-1) ');'];
             eval(str0);                       
             results = {}; 
             res = struct;
