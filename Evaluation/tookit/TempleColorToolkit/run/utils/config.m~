@@ -20,9 +20,9 @@ conf.RES_MIDDLE_PART = 'results';
 
 
 %% for specific video startFrame and endFrame config
-conf.weirdVideoList = {'David','Football1'};
+conf.weirdVideoList = {'Busstation_ce2','David','Football1','Hurdle_ce2'};
 conf.OriginalStartEndF = containers.Map();
-% 因为这两个视频没有从第一帧开始
+% 因为这两个视频没有qianj
 %conf.OriginalStartEndF('Busstation_ce2')        = [6,400];
 conf.OriginalStartEndF('David')                 = [300,770];
 conf.OriginalStartEndF('Football1')             = [1,74];
