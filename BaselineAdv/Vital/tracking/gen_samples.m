@@ -45,8 +45,15 @@ switch (type)
         end
 end
 
-samples(:,3) = max(10,min(w-10,samples(:,3)));
-samples(:,4) = max(10,min(h-10,samples(:,4)));
+if bb(3) < 10 || bb(4) < 10
+    samples(:,3) = max(3,min(w-10,samples(:,3)));
+    samples(:,4) = max(3,min(h-10,samples(:,4)));
+else
+    samples(:,3) = max(10,min(w-10,samples(:,3)));
+    samples(:,4) = max(10,min(h-10,samples(:,4)));
+end
+
+
 
 % [left top width height]
 bb_samples = [samples(:,1)-samples(:,3)/2 samples(:,2)-samples(:,4)/2 samples(:,3:4)];

@@ -1,4 +1,4 @@
-function VITAL_ADV3_6_1__wrapper
+function VITAL_ADV3_7_1__wrapper
 
 %%% 对比实验，上一帧+光流移动框，为铆钉点。  然后不是“整体”的前五名取平均，而是两个中心分别取前五，然后两中心二选一
 %%%$$$ 上一帧+光流移动框 无阈值 两中心取其一
@@ -169,7 +169,7 @@ while true
    
     
     %% %$$$ CENTER 4  targetLoc_Itp_Opt
-    optItpFlow = optF(imgSet,-999,'itp');
+    optItpFlow = optF(image,-999,'itp');
     targetLoc_Itp_Opt = optShiftRect(targetLoc_Itp,optItpFlow);
     
 
@@ -184,7 +184,7 @@ while true
     samples4 = gen_samples('gaussian', targetLoc_Itp_Opt, opts.nSamples, opts, trans_f, scale_f);
     samples = [samples1;samples2;samples3;samples4];
     
-    img = imread(imgSet{To});
+    img = imread(image);
     if(size(img,3)==1), img = cat(3,img,img,img); end 
     
     
@@ -296,8 +296,9 @@ while true
     % **********************************
     %targetLoc = [110.0 110.0 110.0 110.0];
     targetLoc = double(targetLoc);
+    reportingScore = sigmoid(target_score);
     %dlmwrite('~/Desktop/aa/fd',targetLoc,'-append','roffset',1);
-    handle = handle.report(handle, targetLoc, target_score);
+    handle = handle.report(handle, targetLoc,reportingScore);
     To = To + 1;
 end
 
@@ -330,6 +331,11 @@ rect2 = [l2;t2;w2;h2];
 rect2 = round(rect2);
 rect2 = rect2';
 end
+
+function output = sigmoid(x)
+output =1./(1+exp(-x));
+end
+
 
 function res = channelizeScores(mat,nDelta,nRecord)
 nGroupChannel = size(mat,1) / nDelta;

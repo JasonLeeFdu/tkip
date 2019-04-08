@@ -2,11 +2,22 @@ clc;
 clear;
 
 numSeq=129;
-numTracker = 18;
-trackerSet = cell(numTracker,1);
+trackerSet = cell(0,1);
 seqSet=cell(numSeq,1);
 gtSet=cell(numSeq,1);
-legendNames=cell(numTracker,1);
+legendNames=cell(0,1);
+
+
+
+trackerSet{1}= 'MEEM';
+trackerSet{2}= 'MCPF';
+trackerSet{3}= 'DSLT';
+trackerSet{4}= 'CCOT';
+trackerSet{5}= 'VITALAdv';
+trackerSet{6}= 'ECO';
+trackerSet{7}= 'MCCT';
+numTracker = length(trackerSet);
+
 
 seqSet{1}='Basketball';
 seqSet{2}='Bicycle';
@@ -137,30 +148,18 @@ seqSet{126}='Thunder_ce';
 seqSet{127}='Yo-yos_ce1';
 seqSet{128}='Yo-yos_ce2';
 seqSet{129}='Yo-yos_ce3';
+bestColorSet = cell(numTracker,1);
+bestColorSet{1}= 'LAB';
+bestColorSet{2}= 'RGB';
 
 
-trackerSet{1} = 'Struck';
-trackerSet{2} = 'MIL';
-trackerSet{3} = 'OAB';
-trackerSet{4} = 'SemiT';
-trackerSet{5} = 'CSK';
-trackerSet{6} = 'ASLA';
-trackerSet{7} = 'Frag';
-trackerSet{8} = 'DFT';
-trackerSet{9} = 'CPF';
-trackerSet{10}= 'IVT';
-trackerSet{11}='LOT';
-trackerSet{12}='CT';
-trackerSet{13}='L1APG';
-trackerSet{14}='FCT';
-trackerSet{15}='KCF';
-trackerSet{16}='MEEM';
-trackerSet{17}='CN2';
-trackerSet{18}= 'VTD';
+
+
+
 
 colorValue=cell(numTracker,1);
 colorValue{1}=[0 0 1];
-colorValue{2}=[136 0 21]/255; %dark red
+colorValue{2}=[1 0 0];
 colorValue{3}=[163 73 164]/255;%purple
 colorValue{4}=[255 127 39]/255;%orange
 colorValue{5}=[1 0 1];%magenta
@@ -174,45 +173,17 @@ colorValue{12}= [1 1 0]; % yellow
 colorValue{13}= [255 215 0]/255; % dark cyan
 colorValue{14}= [105 105 105]/255;
 colorValue{15}= [0 1 0];
-colorValue{16}= [1 0 0];
+colorValue{16}= [136 0 21]/255; %dark red
 colorValue{17}= [0 0 1];
 colorValue{18}= [1 0 0];
+colorValue{19}= [77 235 255]/255;
 
-bestColorSet = cell(numTracker,1);
-bestColorSet{1} = 'HSV';
-bestColorSet{2} = 'LAB';
-bestColorSet{3} = 'LAB';
-bestColorSet{4} = 'OPPONENT';
-bestColorSet{5} = 'OPPONENT';
-bestColorSet{6} = 'LAB';
-bestColorSet{7} = 'HSV';
-bestColorSet{8} = 'TRGB';
-bestColorSet{9} = 'HSV';
-bestColorSet{10}= 'OPPONENT';
-bestColorSet{11}= 'OPPONENT';
-bestColorSet{12}= 'HSV';
-bestColorSet{13}= 'OPPONENT';
-bestColorSet{14}= 'OPPONENT';
-bestColorSet{15}= 'LAB';
-bestColorSet{16}= 'LAB';
+
 
 iBestColorSet = cell(numTracker,1);
-iBestColorSet{1} = 'HSV';
-iBestColorSet{2} = 'LAB';
-iBestColorSet{3} = 'LAB';
-iBestColorSet{4} = 'OPP';
-iBestColorSet{5} = 'OPP';
-iBestColorSet{6} = 'LAB';
-iBestColorSet{7} = 'HSV';
-iBestColorSet{8} = 'TRGB';
-iBestColorSet{9} = 'HSV';
-iBestColorSet{10}= 'OPP';
-iBestColorSet{11}= 'OPP';
-iBestColorSet{12}= 'HSV';
-iBestColorSet{13}= 'OPP';
-iBestColorSet{14}= 'OPP';
-iBestColorSet{15}= 'LAB';
-iBestColorSet{16}= 'LAB';
+iBestColorSet{1}= 'LAB';
+iBestColorSet{2}= 'RGB';
+
 
 lineType = cell(numTracker,1);
 lineType{1}='-';
@@ -233,6 +204,7 @@ lineType{15}='-';
 lineType{16}='-';
 lineType{17}='--';
 lineType{18}='--';
+lineType{19}='--';
 
 totalFrame=zeros(numTracker,1);
 auc=zeros(numTracker,1);
@@ -250,7 +222,7 @@ for i=1:numTracker
     tracker = trackerSet{i};
     for j=1:numSeq
         fprintf('processing %d %d\n',i,j);
-        if i<=numTracker-2
+        if i<= 2
             colorModel=bestColorSet{i};
             rtFile=strcat('results/',tracker,'/',seqSet{j},'_',tracker,'_',colorModel,'.txt');
         else
@@ -312,44 +284,28 @@ for i=1:numTracker
     end
     auc(i)=mean(finalSuccRate(i,:));
     strauc=sprintf(' [%.4f]',auc(i));
-    if i<=numTracker-2
+	if i <= 2 
         legendNames{i}=strcat(trackerSet{i},'(',iBestColorSet{i},')',strauc);
-    elseif i==numTracker-1
-        legendNames{i}=strcat('CN_{2}',strauc);
-    elseif i==numTracker
-        legendNames{i}=strcat('VTD',strauc);
+    else
+        legendNames{i}=strcat(trackerSet{i},strauc);
     end
 end
 
 [sauc,indexauc]=sort(auc,'descend');
-
 figure1=figure;
 box on;
 hold on;
-plot(thresholdSet,finalSuccRate(indexauc(1),:), lineType{indexauc(1)},'LineWidth',4,'Color',colorValue{indexauc(1)});
-plot(thresholdSet,finalSuccRate(indexauc(2),:),lineType{indexauc(2)},'LineWidth',4,'Color',colorValue{indexauc(2)});
-plot(thresholdSet,finalSuccRate(indexauc(3),:),lineType{indexauc(3)},'LineWidth',4,'Color',colorValue{indexauc(3)});
-plot(thresholdSet,finalSuccRate(indexauc(4),:),lineType{indexauc(4)},'LineWidth',4,'Color',colorValue{indexauc(4)});
-plot(thresholdSet,finalSuccRate(indexauc(5),:),lineType{indexauc(5)},'LineWidth',4,'Color',colorValue{indexauc(5)});
-plot(thresholdSet,finalSuccRate(indexauc(6),:),lineType{indexauc(6)},'LineWidth',4,'Color',colorValue{indexauc(6)});
-plot(thresholdSet,finalSuccRate(indexauc(7),:),lineType{indexauc(7)},'LineWidth',4,'Color',colorValue{indexauc(7)});
-plot(thresholdSet,finalSuccRate(indexauc(8),:),lineType{indexauc(8)},'LineWidth',4,'Color',colorValue{indexauc(8)});
-plot(thresholdSet,finalSuccRate(indexauc(9),:),lineType{indexauc(9)},'LineWidth',4,'Color',colorValue{indexauc(9)});
-plot(thresholdSet,finalSuccRate(indexauc(10),:),lineType{indexauc(10)},'LineWidth',4,'Color',colorValue{indexauc(10)});
-plot(thresholdSet,finalSuccRate(indexauc(11),:),lineType{indexauc(11)},'LineWidth',4,'Color',colorValue{indexauc(11)});
-plot(thresholdSet,finalSuccRate(indexauc(12),:),lineType{indexauc(12)},'LineWidth',4,'Color',colorValue{indexauc(12)});
-plot(thresholdSet,finalSuccRate(indexauc(13),:),lineType{indexauc(13)},'LineWidth',4,'Color',colorValue{indexauc(13)});
-plot(thresholdSet,finalSuccRate(indexauc(14),:),lineType{indexauc(14)},'LineWidth',4,'Color',colorValue{indexauc(14)});
-plot(thresholdSet,finalSuccRate(indexauc(15),:),lineType{indexauc(15)},'LineWidth',4,'Color',colorValue{indexauc(15)});
-plot(thresholdSet,finalSuccRate(indexauc(16),:),lineType{indexauc(16)},'LineWidth',4,'Color',colorValue{indexauc(16)});
-plot(thresholdSet,finalSuccRate(indexauc(17),:),lineType{indexauc(17)},'LineWidth',4,'Color',colorValue{indexauc(17)});
-plot(thresholdSet,finalSuccRate(indexauc(18),:),lineType{indexauc(18)},'LineWidth',4,'Color',colorValue{indexauc(18)});
+finalSuccRate = single(finalSuccRate);
+thresholdSet = single(thresholdSet);
+for idx =1:length(trackerSet)
+   plot(thresholdSet,finalSuccRate(indexauc(idx),:),lineType{indexauc(idx)},'LineWidth',4,'Color',colorValue{indexauc(idx)});   
+end
 
 legend(legendNames{indexauc(1)},legendNames{indexauc(2)},legendNames{indexauc(3)},legendNames{indexauc(4)},...
-    legendNames{indexauc(5)},legendNames{indexauc(6)},legendNames{indexauc(7)},legendNames{indexauc(8)},legendNames{indexauc(9)},...
-    legendNames{indexauc(10)},legendNames{indexauc(11)},legendNames{indexauc(12)},legendNames{indexauc(13)},legendNames{indexauc(14)},legendNames{indexauc(15)},...
-    legendNames{indexauc(16)},legendNames{indexauc(17)},legendNames{indexauc(18)},'Location','EastOutside');
-set(gca,'FontSize',22);
+    legendNames{indexauc(5)},legendNames{indexauc(6)},legendNames{indexauc(7)},'Location','EastOutside');%,'FontWeight','bold');
+set(gca,'FontSize',30);
+set(gca,'FontWeight','bold');
+
 set(gcf,'Position',[100 100 1500 800]);
 titlename=strcat('Success plots');
 title(titlename,'FontSize',40);
@@ -371,16 +327,10 @@ for i=1:numTracker
         finalPreRate(i,k)=finalPreRate(i,k)/numSeq;
     end
     strauc=sprintf(' [%.4f]',finalPreRate(i,tpInx));
-    if i<=numTracker-2
-        if strcmp(trackerSet{i},'ColorPF')
-            legendNames{i}=strcat('CPF','(',iBestColorSet{i},')',strauc);
-        else
-            legendNames{i}=strcat(trackerSet{i},'(',iBestColorSet{i},')',strauc);
-        end
-    elseif i==numTracker-1
-        legendNames{i}=strcat('CN_{2}',strauc);
-    elseif i==numTracker
-        legendNames{i}=strcat('VTD',strauc);
+    if i <= 2 
+        legendNames{i}=strcat(trackerSet{i},'(',iBestColorSet{i},')',strauc);
+    else
+        legendNames{i}=strcat(trackerSet{i},strauc);
     end
 end
 tpPreRate = finalPreRate(:,tpInx);
@@ -388,31 +338,16 @@ tpPreRate = finalPreRate(:,tpInx);
 figure2=figure;
 box on;
 hold on;
-plot(thresholdSetError,finalPreRate(indexpre(1),:),lineType{indexpre(1)},'LineWidth',4,'Color',colorValue{indexpre(1)});
-plot(thresholdSetError,finalPreRate(indexpre(2),:),lineType{indexpre(2)},'LineWidth',4,'Color',colorValue{indexpre(2)});
-plot(thresholdSetError,finalPreRate(indexpre(3),:),lineType{indexpre(3)},'LineWidth',4,'Color',colorValue{indexpre(3)});
-plot(thresholdSetError,finalPreRate(indexpre(4),:),lineType{indexpre(4)},'LineWidth',4,'Color',colorValue{indexpre(4)});
-plot(thresholdSetError,finalPreRate(indexpre(5),:),lineType{indexpre(5)},'LineWidth',4,'Color',colorValue{indexpre(5)});
-plot(thresholdSetError,finalPreRate(indexpre(6),:),lineType{indexpre(6)},'LineWidth',4,'Color',colorValue{indexpre(6)});
-plot(thresholdSetError,finalPreRate(indexpre(7),:),lineType{indexpre(7)},'LineWidth',4,'Color',colorValue{indexpre(7)});
-plot(thresholdSetError,finalPreRate(indexpre(8),:),lineType{indexpre(8)},'LineWidth',4,'Color',colorValue{indexpre(8)});
-plot(thresholdSetError,finalPreRate(indexpre(9),:),lineType{indexpre(9)},'LineWidth',4,'Color',colorValue{indexpre(9)});
-plot(thresholdSetError,finalPreRate(indexpre(10),:),lineType{indexpre(10)},'LineWidth',4,'Color',colorValue{indexpre(10)});
-plot(thresholdSetError,finalPreRate(indexpre(11),:),lineType{indexpre(11)},'LineWidth',4,'Color',colorValue{indexpre(11)});
-plot(thresholdSetError,finalPreRate(indexpre(12),:),lineType{indexpre(12)},'LineWidth',4,'Color',colorValue{indexpre(12)});
-plot(thresholdSetError,finalPreRate(indexpre(13),:),lineType{indexpre(13)},'LineWidth',4,'Color',colorValue{indexpre(13)});
-plot(thresholdSetError,finalPreRate(indexpre(14),:),lineType{indexpre(14)},'LineWidth',4,'Color',colorValue{indexpre(14)});
-plot(thresholdSetError,finalPreRate(indexpre(15),:),lineType{indexpre(15)},'LineWidth',4,'Color',colorValue{indexpre(15)});
-plot(thresholdSetError,finalPreRate(indexpre(16),:),lineType{indexpre(16)},'LineWidth',4,'Color',colorValue{indexpre(16)});
-plot(thresholdSetError,finalPreRate(indexpre(17),:),lineType{indexpre(17)},'LineWidth',4,'Color',colorValue{indexpre(17)});
-plot(thresholdSetError,finalPreRate(indexpre(17),:),lineType{indexpre(17)},'LineWidth',4,'Color',colorValue{indexpre(18)});
-
+for idx =1:length(trackerSet)
+   plot(thresholdSetError,finalPreRate(indexpre(idx),:),lineType{indexpre(idx)},'LineWidth',4,'Color',colorValue{indexpre(idx)});   
+end
 
 legend(legendNames{indexpre(1)},legendNames{indexpre(2)},legendNames{indexpre(3)},legendNames{indexpre(4)},...
-    legendNames{indexpre(5)},legendNames{indexpre(6)},legendNames{indexpre(7)},legendNames{indexpre(8)},legendNames{indexpre(9)},...
-    legendNames{indexpre(10)},legendNames{indexpre(11)},legendNames{indexpre(12)},legendNames{indexpre(13)},legendNames{indexpre(14)},legendNames{indexpre(15)},...
-    legendNames{indexpre(16)},legendNames{indexpre(17)},legendNames{indexpre(18)},'Location','EastOutside');
-set(gca,'FontSize',22);
+    legendNames{indexpre(5)},legendNames{indexpre(6)},legendNames{indexauc(7)},'Location','EastOutside');
+set(gca,'FontSize',30);
+set(gca,'FontWeight','bold');
+
+
 set(gcf,'Position',[100 100 1500 800]);
 titlename=strcat('Precision plots');
 title(titlename,'FontSize',40);

@@ -328,7 +328,23 @@ for ti=1:numTracker
     plot(thresholdSetError,finalPreRate(indexpre(3),:),'-','LineWidth',4,'Color',colorValue{indexpre(3)});
     plot(thresholdSetError,finalPreRate(indexpre(4),:),'-','LineWidth',4,'Color',colorValue{indexpre(4)});
     plot(thresholdSetError,finalPreRate(indexpre(5),:),'-','LineWidth',4,'Color',colorValue{indexpre(5)});
-    plot(thresholdSetError,finalPreRate(indexpre(6),:),'-','LineWidth',4,'Color',colorValue{indexpre(6)});
+    plot(thresholdSetError,FlagVid = false;
+
+
+
+<<<<<<< HEAD
+for idxVideo= 3:3:length(videosList)% 对于每一个视频(此处可以使用多进程)  
+=======
+
+for idxVideo= 3:4:length(videosList)% 对于每一个视频(此处可以使用多进程)  
+>>>>>>> 0443d960856655cfb79d59908cbeead76d0e9824
+     disp([ '================== AdvBaseline Validation check fixed version1: ADV' ' --- ' ', ' num2str(idxVideo) '_' videosList(idxVideo).name '================== '])       
+     completeFileName = sprintf('%s_%s_Adv.mat',videosList(idxVideo).name,trackers{1}.name);
+     if exist(fullfile(resPathBase,completeFileName),'file')  && (~overWrite)
+          fprintf([ 'Best Result --- '  num2str(idxVideo) '_' videosList(idxVideo).name]);
+          fprintf(' is DONE! \n'); 
+          continue;
+     endfinalPreRate(indexpre(6),:),'-','LineWidth',4,'Color',colorValue{indexpre(6)});
     plot(thresholdSetError,finalPreRate(indexpre(7),:),'-','LineWidth',4,'Color',colorValue{indexpre(7)});
     plot(thresholdSetError,finalPreRate(indexpre(8),:),'-','LineWidth',4,'Color',colorValue{indexpre(8)});
     plot(thresholdSetError,finalPreRate(indexpre(9),:),'-','LineWidth',4,'Color',colorValue{indexpre(9)});
