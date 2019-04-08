@@ -8,9 +8,9 @@ function [Res] = interpAlg(imgSet,To)
 
 if To < 0
     %resolve To
-    p1 = strfind(path,'/');
-    p2 = strfind(path,'.');
-    To = str2double(path(p1(end)+1:p2(end)-1));
+    p1 = strfind(imgSet,'/');
+    p2 = strfind(imgSet,'.');
+    To = str2double(imgSet(p1(end)+1:p2(end)-1));
     token = imgSet;
 else
     token = imgSet{To};
@@ -60,7 +60,7 @@ elseif length(strfind(lower(token),'vot')) > 0 %%%
     targetPath  = VOT2016_FRM_OPT_PATH;
     tmp = token;
     poses = strfind(tmp,'/');
-    videoName = tmp(poses(end-1)+1:poses(end)-1);
+    videoName = tmp(poses(end-2)+1:poses(end-1)-1);
 
 end
 

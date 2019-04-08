@@ -26,7 +26,7 @@ seqs=ConfigSeqs100;
 seqNameBox = {};
 numSeq=length(seqs);
 metricTypeSet = {'error', 'overlap'};
-overWrite = false;
+overWrite = true;
 resPathBase = fullfile('/home/winston/workSpace/PycharmProjects/tracking/TrackingGuidedInterpolation/Evaluation/results','FourCentersItpOpt');
 datasetBase = fullfile('/home/winston/Datasets/Tracking/Original',targetSet);
 

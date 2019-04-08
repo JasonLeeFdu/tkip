@@ -20,8 +20,9 @@
 /BaselineAdv/Vital/dataset
 /BaselineAdv/Vital/matconvnet
 /BaselineAdv/Vital/models
+/BaselineAdv/Enhancer
 
-
+ 
 /Evaluation/tookit/VOT_Toolkit/analysis
 /Evaluation/tookit/VOT_Toolkit/experiment
 /Evaluation/tookit/VOT_Toolkit/native
@@ -32,6 +33,10 @@
 /Evaluation/tookit/VOT_Toolkit/utilities
 /Evaluation/tookit/VOT_Toolkit/workspace
 /Evaluation/tookit/VOT_Toolkit/workspace(Ori)
+/Evaluation/tookit/VOT_Toolkit/workspaceVITAL
+/Evaluation/tookit/VOT_Toolkit/workspace4Center2
+/Evaluation/tookit/VOT_Toolkit/workspaceVITAL4Center
+/Evaluation/tookit/VOT_Toolkit/workspaceVITAL4Centers
 /Evaluation/tookit/VOT_Toolkit/Dockerfile
 /Evaluation/tookit/VOT_Toolkit/index.md
 /Evaluation/tookit/VOT_Toolkit/LICENSE.txt
@@ -40,10 +45,6 @@
 /Evaluation/tookit/VOT_Toolkit/toolkit_version.m
 /Evaluation/tookit/VOT_Toolkit/VERSION
 
-/Evaluation/tookit/VOT_Toolkit/workspaceVITAL/cache
-/Evaluation/tookit/VOT_Toolkit/workspaceVITAL/logs
-/Evaluation/tookit/VOT_Toolkit/workspaceVITAL/results
-/Evaluation/tookit/VOT_Toolkit/workspaceVITAL/templates
 
 /Evaluation/tookit/TempleColorToolkit/figures
 /Evaluation/tookit/TempleColorToolkit/groundtruth

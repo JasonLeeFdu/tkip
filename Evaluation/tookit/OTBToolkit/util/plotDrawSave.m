@@ -23,8 +23,8 @@ end
 i=1;
 AUC=[];
 
-fontSize = 16;
-fontSizeLegend = 10;
+fontSize = 17;
+fontSizeLegend = 13;
 
 
 %%%%%%%%%%%%%%%%%  draw
@@ -56,10 +56,10 @@ for idxTrk=indexSort(1:rankNum)
 end
 
 
-legend1=legend(tmpName,'Interpreter', 'none','fontsize',fontSizeLegend);
-title(titleName,'fontsize',fontSize);
-xlabel(xLabelName,'fontsize',fontSize);
-ylabel(yLabelName,'fontsize',fontSize);
+legend1=legend(tmpName,'Interpreter', 'none','fontsize',fontSizeLegend,'FontWeight','bold');
+title(titleName,'fontsize',fontSize,'FontWeight','bold');
+xlabel(xLabelName,'fontsize',fontSize,'FontWeight','bold');
+ylabel(yLabelName,'fontsize',fontSize,'FontWeight','bold');
 % legend1=legend(tmpName(1:round(length(tmpName)/2)),'Interpreter', 'none','fontsize',fontSizeLegend,'Location','NorthWest');
 % legend2=legend(tmpName(round(length(tmpName)/2)+1:end),'Interpreter', 'none','fontsize',fontSizeLegend,'Location','SouthEast');
 

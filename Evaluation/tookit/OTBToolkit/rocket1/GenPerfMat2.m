@@ -16,7 +16,7 @@ for idxSeq=1:length(seqs)
        if ~strcmp('VITAL_Adv',t.name) continue;end
     end
     results = {};
-    load([rpAll s.name '_' t.name '.mat']);
+    load([rpAll s.name '_' trackers{1}.name '.mat']);
     if isempty(results)
         res = resultsAdv{1};
         results{end+1}=res;

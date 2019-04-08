@@ -12,7 +12,7 @@ attPath = [BASE_PATH 'Evaluation/tookit/OTBToolkit' '/anno/att/']; % The folder 
 strategy = '';
 global additionalNameTag;
 additionalNameTag = strategy;
-
+isDrawTotal = false;
 %%%%%%%%%  About path  %%%%%%%%%%%%
                                      
 evalType = 'OPE';                       % only one                                  
@@ -25,11 +25,11 @@ trackersPy=[];%ConfigTrackers;
 trackersMat = ConfigStateofArtMatTrackers;
 trackers = [trackersPy,trackersMat];
 
-metricTypeSet = {'error', 'overlap'};
+metricTypeSet = {'overlap','error'};
 evalTypeSet = {'OPE'};
-rankingType = 'threshold'; %AUC, threshold AUC
-rankNum = 10;%number of plots to show
-drawAttrGraph= false;
+rankingType = 'AUC'; %AUC, threshold AUC
+rankNum = 18;%number of plots to show
+drawAttrGraph= true;
 % start to config the seq part and set the path of the tracking res  ConfigSeqs
 
 
@@ -112,15 +112,17 @@ nameSeqAll=cell(numSeq,1);
 numAllSeq=zeros(numSeq,1);
 
 
-% att=[];
-% for idxSeq=1:numSeq
-%     s = seqs{idxSeq};
-%     nameSeqAll{idxSeq}=s.name;
-%     attributeFileName = [attPath lower(s.name) '.txt'];
-%     att(idxSeq,:)=load(attributeFileName);
-% end
+att=[];
+for idxSeq=1:numSeq
+    s = seqs{idxSeq};
+    nameSeqAll{idxSeq}=s.name;
+    attributeFileName = [attPath lower(s.name) '.txt'];
+    att(idxSeq,:)=load(attributeFileName);
+end
 
-%attNum = size(att,2);
+attNum = size(att,2);
+
+
 if ~exist(figPath,'dir')
     mkdir(figPath);
 end
@@ -168,9 +170,11 @@ for i=1:length(metricTypeSet) % set error & overlap
         
         switch metricType
             case 'overlap'
-                titleName = [dBType strcat(downSampleType ) '- IOU Success plots of ' evalType];
+                %titleName = [dBType strcat(downSampleType ) '- IOU Success plots of ' evalType];
+                titleName = ['OTB-100' '  IOU Success plots of ' evalType];
             case 'error'
-                titleName = [dBType strcat(downSampleType ) '- Precision plots of ' evalType];
+                %titleName = [dBType strcat(downSampleType ) '- Precision plots of ' evalType];
+                titleName = ['OTB-100' '  Precision plots of ' evalType];
         end
         
         %%
@@ -197,13 +201,18 @@ for i=1:length(metricTypeSet) % set error & overlap
         idxSeqSet = 1:length(seqs);
         
         % draw and save the overall performance plot
-        plotDrawSave(numTrk,plotDrawStyle,aveSuccessRatePlot,idxSeqSet,rankNum,rankingType,rankIdx,nameTrkAll,thresholdSet,titleName, xLabelName,yLabelName,figName,metricType);
+        if isDrawTotal
+            plotDrawSave(numTrk,plotDrawStyle,aveSuccessRatePlot,idxSeqSet,rankNum,rankingType,rankIdx,nameTrkAll,thresholdSet,titleName, xLabelName,yLabelName,figName,metricType);
+        end
         
         % draw and save the performance plot for each attribute
+        TAR = 11;
         if drawAttrGraph 
                  attTrld = 0;
             for attIdx=1:attNum % attNum of the attributes to be studied and displayed
-
+                if attIdx ~= TAR
+                   continue; 
+                end
                 idxSeqSet=find(att(:,attIdx)>attTrld);
 
                 if length(idxSeqSet) < 2
@@ -215,9 +224,11 @@ for i=1:length(metricTypeSet) % set error & overlap
                 titleName = ['Plots of ' evalType ': ' attName{attIdx} ' (' num2str(length(idxSeqSet)) ')'];
                 switch metricType
                     case 'overlap'
-                        titleName = [strcat(downSampleType,num2str(dsRate)) '- Success plots of ' evalType ' - ' attName{attIdx} ' (' num2str(length(idxSeqSet)) ')'];
+                        titleName = ['OTB-100 Success ' evalType ':' attName{attIdx} ' (' num2str(length(idxSeqSet)) ')'];
+                        rankingType = 'AUC'; 
                     case 'error'
-                        titleName = [strcat(downSampleType,num2str(dsRate)) '- Precision plots of ' evalType ' - ' attName{attIdx} ' (' num2str(length(idxSeqSet)) ')'];
+                        titleName = ['OTB-100 Precision ' evalType ':' attName{attIdx} ' (' num2str(length(idxSeqSet)) ')'];
+                        rankingType = 'threshold';
                 end
                 plotDrawSave(numTrk,plotDrawStyle,aveSuccessRatePlot,idxSeqSet,rankNum,rankingType,rankIdx,nameTrkAll,thresholdSet,titleName, xLabelName,yLabelName,figName,metricType);
             end   
