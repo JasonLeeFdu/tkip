@@ -12,7 +12,8 @@ attPath = [BASE_PATH 'Evaluation/tookit/OTBToolkit' '/anno/att/']; % The folder 
 strategy = '';
 global additionalNameTag;
 additionalNameTag = strategy;
-isDrawTotal = false;
+isDrawTotal = true;
+
 %%%%%%%%%  About path  %%%%%%%%%%%%
                                      
 evalType = 'OPE';                       % only one                                  
@@ -29,7 +30,7 @@ metricTypeSet = {'overlap','error'};
 evalTypeSet = {'OPE'};
 rankingType = 'AUC'; %AUC, threshold AUC
 rankNum = 18;%number of plots to show
-drawAttrGraph= true;
+drawAttrGraph= false;
 % start to config the seq part and set the path of the tracking res  ConfigSeqs
 
 

@@ -562,7 +562,7 @@ for To = 2:nFrames
             'maxiter',opts.maxiter_update,'learningRate',opts.learningRate_update);
         else %长时更细net.fc以及 net.G(Regular renew)!!这个地方也是本文的创新点 
         [net_fc, net_G] = mdnet_finetune_hnm_update(net_fc,net_G,pos_data,neg_data,opts,...
-            'maxiter',opts.maxiter_update,'learningRate',opts.learningRate_update);
+            'maxiter',opts.maxiNetter_update,'learningRate',opts.learningRate_update);
         end
     end
     fprintf('.');
