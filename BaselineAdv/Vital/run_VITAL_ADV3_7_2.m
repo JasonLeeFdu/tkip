@@ -1,4 +1,4 @@
-function [ result ,Interp_bbox,Choice,th,fps] = run_VITAL_ADV3_7_1(imgSet, init_rect,localTh)
+function [ result ,Interp_bbox,Choice,th,fps] = run_VITAL_ADV3_7_2(imgSet, init_rect,localTh)
 
 %%% 四中心算法，上一帧框、上一帧光流框(_1)、插帧框、插帧光流框(_5)
 %%% 本算法目前需要插帧模型的辅助，目前仅仅在OTB集合上进行模拟  
@@ -120,7 +120,7 @@ target_score = 2.8888888;
 Choice(1)= 0.0;
 th = -1;
 
-ETA_Thresh = 0.0002;
+ETA_Thresh = 0.0005;
 
 %% Main loop
 for To = 2:nFrames
