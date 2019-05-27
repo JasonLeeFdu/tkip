@@ -120,7 +120,7 @@ target_score = 2.8888888;
 Choice(1)= 0.0;
 th = -1;
 
-ETA_Thresh = 0.0005;
+ETA_Thresh = 0.0004;
 
 %% Main loop
 for To = 2:nFrames
