@@ -34,9 +34,8 @@
 /Evaluation/tookit/VOT_Toolkit/workspace
 /Evaluation/tookit/VOT_Toolkit/workspace(Ori)
 /Evaluation/tookit/VOT_Toolkit/workspaceVITAL
-/Evaluation/tookit/VOT_Toolkit/workspace4Center2
+/Evaluation/tookit/VOT_Toolkit/workspace4Center2(JROTM)
 /Evaluation/tookit/VOT_Toolkit/workspaceVITAL4Center
-/Evaluation/tookit/VOT_Toolkit/workspaceVITAL4Centers
 /Evaluation/tookit/VOT_Toolkit/Dockerfile
 /Evaluation/tookit/VOT_Toolkit/index.md
 /Evaluation/tookit/VOT_Toolkit/LICENSE.txt
@@ -44,6 +43,18 @@
 /Evaluation/tookit/VOT_Toolkit/toolkit_path.m
 /Evaluation/tookit/VOT_Toolkit/toolkit_version.m
 /Evaluation/tookit/VOT_Toolkit/VERSION
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /Evaluation/tookit/TempleColorToolkit/figures
